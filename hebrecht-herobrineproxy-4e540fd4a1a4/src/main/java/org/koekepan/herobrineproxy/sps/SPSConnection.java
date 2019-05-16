@@ -164,6 +164,7 @@ public class SPSConnection implements ISPSConnection {
 	}
 
 	
+	
 	@Override
 	public void receiveConnectionID(int connectionID) {
 		this.connectionID = connectionID;

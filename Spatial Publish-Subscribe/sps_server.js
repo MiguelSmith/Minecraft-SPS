@@ -10,13 +10,12 @@
     move()                  change the coordinates and AoI of the client
     ID()                    return the client id to the client on connnection
 */
+
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var VAST = require('./types');
 
-//var client_id = -1;
-//var server_id = -1;
 var connectionID = -1;
 var channelSubID =
 {
@@ -25,33 +24,28 @@ var channelSubID =
     "ingame":-1
 };
 
+var subType =
+{
+    "UNIQUE":0,
+    "UPDATE":1,
+    "DUPLICATE":2
+}
+
 //buffer queue for packets
 var packets = [];
 var packStrings = [];
 
-//map of connected clients
-//var client_list = [];
-
-//map of connected servers and their channels
-//var server_list = {};
-
-//var connectionList = {};
-
 // map of subscribers for a channel
-//var subscribers = {};
-
-// map of channels of subscribers
-//var channels = [
-//    [],
-//    []
-//];
+// key -> channel
+// value -> {
+//            key -> subID
+//            value - > subPack
+//          }
+var subscriberList = {};
 
 //temporary socket -> ID map
 var socketToConnectionIDMap = {};
 var connectionInfoList = {};
-
-//var clientIDs = {};
-//var serverIDs = {};
 
 //serve html file
 app.get('/', function(req, res)
@@ -63,7 +57,7 @@ app.get('/', function(req, res)
 
 /*
 
-SPS server must handle incoming connections and assign an ID.
+//SPS server must handle incoming connections and assign an ID.
 SPS server must handle disconnections and removeID from subscribers
 SPS server must keep track of channels and users subscribed to channels
 SPS server must allow any connection to publish a message to a specific channel
@@ -79,12 +73,12 @@ io.on('connection', function(socket) {
     socketToConnectionIDMap[socket] = connectionID;
     connectionInfoList[connectionID] =
         {
-            id: connectionID,                          // id
-            socket: socket,                            // socket
+            id: connectionID,                             // id
+            socket: socket,                               // socket
             x: Math.floor((Math.random() * 300) - 150),   // x coordinate of client
             y: Math.floor((Math.random() * 300) - 150),   // y coordinate of client
-            AoIRadius: 0,                             // radius of AoI
-            subscriptions: {}   // channels to which connection is subscribed
+            AoIRadius: 0,                                 // radius of AoI
+            subscriptions: {}                             // channels to which connection is subscribed
         };
 
     //handle a disconnect
@@ -100,25 +94,38 @@ io.on('connection', function(socket) {
     // publish message to subscribers
     socket.on('publish', function(connectionID, player, x, y, radius, payload, channel)
     {
-        socket.broadcast.emit('publication', connectionID, player, x, y, radius, payload, channel);
+        for (var keys in subscriberList[channel]) {
+            var sub = subscriberList[channel][keys];
+            if (_contains(sub, x, y, radius)) {
+                socket.broadcast.emit('publication', connectionID, player, x, y, radius, payload, channel);
+            }
+        }
 
         return false;
     });
 
     socket.on('subscribe', function(channel, x, y, AoI) {
-        var peerID = socketToConnectionIDMap[socket];
-        var connection = connectionInfoList[id];
+        var connectionID = socketToConnectionIDMap[socket];
+        console.log("Received subscription request from " + connectionID + " for <" + x + "," + y + "> for an AoI of " + AoI);
+
+        var connection = connectionInfoList[connectionID];
+
+        // TODO: create duplicate, update and new packet checker
 
         // create subID for a channel if it doesn't exist
         if (!channelSubID.hasOwnProperty(channel)) {
+            console.log("Creating entry for channel " + channel);
             channelSubID[channel] = -1;
         }
-        channelSubID[channel]++;
+        var subID = channelSubID[channel]++;
 
+        // check whether it is a point or area publication
+        // NOTE: since this is a rough implementation, this crude method is used since x will always
+        // be undefined when it is a publication that is not spatially important
         if (x == undefined) {
-            var pack = new VAST.sub(peerID, channelSubID[channel], connection.x, connection.y, connection.AoIRadius, channel);
+            var pack = new VAST.sub(connectionID, subID, connection.x, connection.y, connection.AoIRadius, channel);
         } else {
-            var pack = new VAST.sub(peerID,channelSubID[channel], x,y,AoI,channel);
+            var pack = new VAST.sub(connectionID, subID, x, y, AoI, channel);
         }
 
         // create subscription channel if it doesn't exist
@@ -127,8 +134,17 @@ io.on('connection', function(socket) {
         }
         connection.subscriptions[channel][subID] = pack;
 
+        connectionInfoList[connectionID] = connection;
+
+        // if this is the first subscription to the channel, create key
+        if (!subscriberList.hasOwnProperty(channel)) {
+            subscriberList[channel] = {};
+        }
+
+        subscriberList[channel][subID] = pack;
     });
 
+    /*
     //handle a subscribe or unsubscribe function
     socket.on('function', function(msg)
     {
@@ -194,7 +210,7 @@ io.on('connection', function(socket) {
 
         return false;
     });
-
+    */
     //move
     socket.on('move', function(msg)
     {
@@ -220,6 +236,18 @@ io.on('connection', function(socket) {
 
     return false;
 });
+
+var _contains = function (sub, pubX, pubYy, pubAoI) {
+    var dx = sub.x - pubX;
+    var dy = sub.y - pubY;
+    var dist = Math.sqrt(Math.pow(dx,2) + Math.pow(dy,2));
+
+    if (dist <= (pubAoI + sub.AoI) {
+        return true;
+    }
+
+    return false;
+}
 
 //set the server to listening
 http.listen(3000, function()

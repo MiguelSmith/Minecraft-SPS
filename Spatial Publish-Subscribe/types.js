@@ -8,18 +8,26 @@
     2018/04/18
 */
 
-var sub = exports.sub = function(clientID,id,x, y, AoI, channel="") {
+var sub = exports.sub = function(connectionID, subID,x, y, AoI, channel="") {
     //this.layer = layer;
     this.x = x || 0;
     this.y = y || 0;
     this.AoI = AoI || 0;
-    this.id = id;
-    this.clientID = clientID;
+    this.subID = subID;
+    this.connectionID = connectionID;
     this.channel = channel;
 
-    this.hash = id+'/'+x+'/'+y+'/'+channel;
+    this.evaluate = function(x,y,AoI) {
+      if (this.x == x && this.y == y && this.AoI != AoI) {
+        return 1;
+      }
+      if (this.x==x && this.y==y && this.AoI == AoI) {
+        return 2
+      }
+      return 0;
+    }
 
     this.toString = function(){
-        return x+','+y+','+AoI+','+channel;
+        return "Subscription ID: "+ this.subID + " Connection ID: " + this.connectionID + " <" + this.x + "," + this.y + "> with radius " + this.AoI + " on channel " + this.channel;
     }
 }
