@@ -77,7 +77,7 @@ io.on('connection', function(socket) {
             socket: socket,                               // socket
             x: Math.floor((Math.random() * 300) - 150),   // x coordinate of client
             y: Math.floor((Math.random() * 300) - 150),   // y coordinate of client
-            AoIRadius: 0,                                 // radius of AoI
+            AoIRadius: 1000,                              // radius of AoI (currently make it large enough that they will always send to each other)
             subscriptions: {}                             // channels to which connection is subscribed
         };
 
@@ -94,19 +94,25 @@ io.on('connection', function(socket) {
     // publish message to subscribers
     socket.on('publish', function(connectionID, player, x, y, radius, payload, channel)
     {
+        console.log("Sending packet from "+connectionID+" to channel "+channel);
+        // just forward packets for now without channels until implementation is fixed
+        socket.broadcast.emit('publication', connectionID, player, x, y, radius, payload, channel);
+        /*
         for (var keys in subscriberList[channel]) {
             var sub = subscriberList[channel][keys];
-            if (_contains(sub, x, y, radius)) {
-                socket.broadcast.emit('publication', connectionID, player, x, y, radius, payload, channel);
+            if (_contains(sub, x, y, radius) && (sub.connectionID != connectionID)) {
+                console.log("Publishing to " + sub.connectionID);
+                socket.broadcast.to(connectionInfoList[sub.connectionID].socket.id).emit('publication', connectionID, player, x, y, radius, payload, channel);
             }
         }
+        */
 
         return false;
     });
 
     socket.on('subscribe', function(channel, x, y, AoI) {
         var connectionID = socketToConnectionIDMap[socket];
-        console.log("Received subscription request from " + connectionID + " for <" + x + "," + y + "> for an AoI of " + AoI);
+        console.log("Received subscription request from " + connectionID);
 
         var connection = connectionInfoList[connectionID];
 
@@ -117,19 +123,23 @@ io.on('connection', function(socket) {
             console.log("Creating entry for channel " + channel);
             channelSubID[channel] = -1;
         }
-        var subID = channelSubID[channel]++;
+        channelSubID[channel]++;
+        var subID = channelSubID[channel];
 
         // check whether it is a point or area publication
         // NOTE: since this is a rough implementation, this crude method is used since x will always
         // be undefined when it is a publication that is not spatially important
         if (x == undefined) {
+            console.log("Subscribing to <" + connection.x + "," + connection.y + "> with an AoI of " + connection.AoIRadius + ". SubID: "+subID);
             var pack = new VAST.sub(connectionID, subID, connection.x, connection.y, connection.AoIRadius, channel);
         } else {
+            console.log("Subscribing to <" + x + "," + y + "> with an AoI of " + AoI + ". SubID: "+subID)
             var pack = new VAST.sub(connectionID, subID, x, y, AoI, channel);
         }
 
         // create subscription channel if it doesn't exist
         if (!connection.subscriptions.hasOwnProperty(channel)) {
+            console.log("Creating channel subscription for " + connection.id + " for channel " + channel);
             connection.subscriptions[channel] = {};
         }
         connection.subscriptions[channel][subID] = pack;
@@ -237,12 +247,12 @@ io.on('connection', function(socket) {
     return false;
 });
 
-var _contains = function (sub, pubX, pubYy, pubAoI) {
+var _contains = function (sub, pubX, pubY, pubAoI) {
     var dx = sub.x - pubX;
     var dy = sub.y - pubY;
     var dist = Math.sqrt(Math.pow(dx,2) + Math.pow(dy,2));
 
-    if (dist <= (pubAoI + sub.AoI) {
+    if (dist <= (pubAoI + sub.AoI)) {
         return true;
     }
 

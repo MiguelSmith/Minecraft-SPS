@@ -31,8 +31,7 @@ public class SPSSession implements IServerSession {
 	private SPSPacketSession packetSession;
 	private PacketHandler packetHandler;
 	private ScheduledExecutorService packetExecutor;
-	private Future<?> packetFuture;
-	
+	private Future<?> packetFuture;	
 	
 	private volatile CountDownLatch joinedLatch;
 	private volatile boolean joined;	

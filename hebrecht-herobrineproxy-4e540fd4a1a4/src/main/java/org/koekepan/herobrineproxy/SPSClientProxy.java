@@ -57,7 +57,7 @@ public class SPSClientProxy {
 			@Override
 			public void sessionAdded(SessionAddedEvent event) {
 				Session session = event.getSession();
-				ConsoleIO.println("HerobrineProxy::sessionAdded => A SessionAdded event occured from <"+session.getHost()+":"+session.getPort()+"> to server <"+spsHost+":"+spsPort+">");
+				ConsoleIO.println("SPSClientProxy::sessionAdded => A SessionAdded event occured from <"+session.getHost()+":"+session.getPort()+"> to server <"+spsHost+":"+spsPort+">");
 				IClientSession clientSession = new ClientSession(session);
 				//IProxySessionNew proxySession = new ProxySessionV3(clientSession, serverHost, serverPort);
 				//IProxySessionNew proxySession = new SPSClientProxySession(clientSession, spsConnection);

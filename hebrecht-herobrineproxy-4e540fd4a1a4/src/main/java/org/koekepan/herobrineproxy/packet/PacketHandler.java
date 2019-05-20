@@ -120,6 +120,7 @@ public class PacketHandler implements Runnable, PacketListener {
 			//	ConsoleIO.println("PacketHandler::run => Sending outgoing packet  <"+packet.getClass().getSimpleName()+">");
 				
 				packet = outgoingPackets.poll();
+				
 				packetSession.send(packet);
 			}			
 		} catch (Exception e) {

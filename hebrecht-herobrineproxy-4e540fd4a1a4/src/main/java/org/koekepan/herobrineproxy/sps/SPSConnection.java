@@ -227,7 +227,7 @@ public class SPSConnection implements ISPSConnection {
 		Packet packet = null;
 		try {
 			int packetId = protocol.getPacketHeader().readPacketId(input);
-		//	ConsoleIO.println("SPSConnection::byteToPacket => Protocol status <"+protocol.getSubProtocol().toString()+">");
+			ConsoleIO.println("SPSConnection::byteToPacket => Protocol status <"+protocol.getSubProtocol().toString()+">");
 			packet = protocol.createIncomingPacket(packetId);
 			packet.read(input);
 			
