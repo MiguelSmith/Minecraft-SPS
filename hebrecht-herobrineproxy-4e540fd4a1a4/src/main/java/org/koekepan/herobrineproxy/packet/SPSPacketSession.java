@@ -43,4 +43,10 @@ public class SPSPacketSession implements IPacketSession {
 		return this.session;
 	}
 
+
+	@Override
+	public void subscribeSession(String channel) {
+		session.subscribeToChannel(channel);	
+	}
+
 }

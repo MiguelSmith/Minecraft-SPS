@@ -16,4 +16,9 @@ public class PacketSession implements IPacketSession {
 	public void send(Packet packet) {
 		session.send(packet);
 	}
+
+
+	@Override
+	public void setChannel(String channel) {		
+	}
 }

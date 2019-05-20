@@ -3,6 +3,7 @@ package org.koekepan.herobrineproxy.packet;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import com.github.steveice10.mc.protocol.packet.login.server.LoginSuccessPacket;
 import com.github.steveice10.packetlib.packet.Packet;
 
 import org.koekepan.herobrineproxy.ConsoleIO;
@@ -120,6 +121,11 @@ public class PacketHandler implements Runnable, PacketListener {
 			//	ConsoleIO.println("PacketHandler::run => Sending outgoing packet  <"+packet.getClass().getSimpleName()+">");
 				
 				packet = outgoingPackets.poll();
+				
+				if (packet instanceof LoginSuccessPacket) {
+					packetSession.setChannel("ingame");
+					packetSession.subscribeSession("ingame");
+				}
 				
 				packetSession.send(packet);
 			}			

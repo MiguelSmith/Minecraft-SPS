@@ -20,6 +20,7 @@ import org.koekepan.herobrineproxy.session.ISession;
 import com.github.steveice10.mc.protocol.MinecraftProtocol;
 import com.github.steveice10.mc.protocol.data.SubProtocol;
 import com.github.steveice10.mc.protocol.packet.login.client.LoginStartPacket;
+import com.github.steveice10.mc.protocol.packet.login.server.LoginSuccessPacket;
 import com.github.steveice10.packetlib.Session;
 import com.github.steveice10.packetlib.io.NetInput;
 import com.github.steveice10.packetlib.io.NetOutput;
@@ -106,7 +107,11 @@ public class SPSConnection implements ISPSConnection {
 							ConsoleIO.println("SPSConnection::publication => Received a packet for an unknown session <"+username+">");
 						}
 					}
-				} else if (listeners.containsKey(username)) {					
+				} else if (packet.packet instanceof LoginSuccessPacket) {
+					subscribeToChannel("ingame");
+				}
+				
+				if (listeners.containsKey(username)) {					
 					//listeners.get(username).packetReceived(packet.packet);
 					ConsoleIO.println("SPSConnection::publication => Sending packet <"+packet.packet.getClass().getSimpleName()+"> for player <"+username+"> at <"+x+":"+y+":"+radius+">");
 					
@@ -227,7 +232,7 @@ public class SPSConnection implements ISPSConnection {
 		Packet packet = null;
 		try {
 			int packetId = protocol.getPacketHeader().readPacketId(input);
-			ConsoleIO.println("SPSConnection::byteToPacket => Protocol status <"+protocol.getSubProtocol().toString()+">");
+			//ConsoleIO.println("SPSConnection::byteToPacket => Protocol status <"+protocol.getSubProtocol().toString()+">");
 			packet = protocol.createIncomingPacket(packetId);
 			packet.read(input);
 			

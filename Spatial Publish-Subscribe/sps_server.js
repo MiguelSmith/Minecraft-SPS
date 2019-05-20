@@ -95,17 +95,15 @@ io.on('connection', function(socket) {
     socket.on('publish', function(connectionID, player, x, y, radius, payload, channel)
     {
         console.log("Sending packet from "+connectionID+" to channel "+channel);
-        // just forward packets for now without channels until implementation is fixed
-        socket.broadcast.emit('publication', connectionID, player, x, y, radius, payload, channel);
-        /*
+
         for (var keys in subscriberList[channel]) {
             var sub = subscriberList[channel][keys];
             if (_contains(sub, x, y, radius) && (sub.connectionID != connectionID)) {
-                console.log("Publishing to " + sub.connectionID);
+                //console.log("Publishing to " + sub.connectionID);
                 socket.broadcast.to(connectionInfoList[sub.connectionID].socket.id).emit('publication', connectionID, player, x, y, radius, payload, channel);
             }
         }
-        */
+
 
         return false;
     });
