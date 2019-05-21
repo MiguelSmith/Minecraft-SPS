@@ -14,6 +14,8 @@ public class SPSPacketSession implements IPacketSession {
 	
 	public SPSPacketSession(ISPSConnection session) {
 		this.session = session;
+		
+		sendSession();
 	}
 		
 	
@@ -21,6 +23,8 @@ public class SPSPacketSession implements IPacketSession {
 		this.session = client;
 		this.username = username;
 		this.channel = channel;
+		
+		sendSession();
 	}
 	
 	@Override
@@ -43,10 +47,19 @@ public class SPSPacketSession implements IPacketSession {
 		return this.session;
 	}
 
-
 	@Override
 	public void subscribeSession(String channel) {
 		session.subscribeToChannel(channel);	
+	}
+	
+	private void sendSession () {
+		this.session.receivePacketSession(this);
+	}
+
+
+	@Override
+	public void unsubscribeSession(String channel) {
+		session.unsubscribeFromChannel(channel);		
 	}
 
 }

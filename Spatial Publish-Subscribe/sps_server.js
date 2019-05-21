@@ -152,6 +152,10 @@ io.on('connection', function(socket) {
         subscriberList[channel][subID] = pack;
     });
 
+    socket.on("unsubscribe", function (channel, x, y, AoI) {
+        // TODO: unsubscribe from channel and remove subIDs from channel list
+    });
+
     /*
     //handle a subscribe or unsubscribe function
     socket.on('function', function(msg)

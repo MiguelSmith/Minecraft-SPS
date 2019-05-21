@@ -1,5 +1,7 @@
 package org.koekepan.herobrineproxy.packet;
 
+import org.koekepan.herobrineproxy.ConsoleIO;
+
 import com.github.steveice10.packetlib.Session;
 import com.github.steveice10.packetlib.packet.Packet;
 
@@ -19,6 +21,18 @@ public class PacketSession implements IPacketSession {
 
 
 	@Override
-	public void setChannel(String channel) {		
+	public void setChannel(String channel) {	
+		//ConsoleIO.println("PacketSession::setChannel => You set the wrong session for the channel");	
+	}
+
+
+	@Override
+	public void subscribeSession(String channel) {	
+		//ConsoleIO.println("PacketSession::subscribeSession => You set the wrong session");
+	}
+
+
+	@Override
+	public void unsubscribeSession(String channel) {		
 	}
 }

@@ -3,6 +3,7 @@ package org.koekepan.herobrineproxy.sps;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.koekepan.herobrineproxy.packet.IPacketSession;
 import org.koekepan.herobrineproxy.packet.PacketListener;
 import org.koekepan.herobrineproxy.session.IProxySessionNew;
 import org.koekepan.herobrineproxy.session.ISession;
@@ -42,8 +43,12 @@ public interface ISPSConnection {
 	// Sending functions
 	public void subscribeToChannel(String channel); // "subscribe"
 	public void subscribeToArea(String channel, int x, int y, int AoI); // "subscribe"
-	public void unsubscribed(String channel); // "function : usub"
+	public void unsubscribeFromChannel(String channel); // "unsubscribe"
+	public void unsubscribeFromArea(String channel);
 	public void publish(SPSPacket packet);
+	
+	// functional functions
 	public void addListener(ISession listener);
 	public void removeListener(ISession listener);
+	public void receivePacketSession(IPacketSession session);
 }

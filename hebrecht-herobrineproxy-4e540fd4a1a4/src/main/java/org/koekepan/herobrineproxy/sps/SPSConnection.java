@@ -12,6 +12,7 @@ import org.koekepan.herobrineproxy.HerobrineProxyProtocol;
 import org.koekepan.herobrineproxy.SPSProxyProtocol;
 import org.koekepan.herobrineproxy.SPSServerProxy;
 import org.koekepan.herobrineproxy.packet.EstablishConnectionPacket;
+import org.koekepan.herobrineproxy.packet.IPacketSession;
 import org.koekepan.herobrineproxy.packet.PacketListener;
 import org.koekepan.herobrineproxy.session.IProxySessionConstructor;
 import org.koekepan.herobrineproxy.session.IProxySessionNew;
@@ -44,6 +45,7 @@ public class SPSConnection implements ISPSConnection {
 	//private PacketProtocol protocol;
 	private Map<String, ISession> listeners = new HashMap<String, ISession>();
 	private IProxySessionConstructor sessionConstructor;
+	private IPacketSession packetSession;
 	
 	public SPSConnection(String SPSHost, int SPSPort) {
 		this.SPSHost = SPSHost;
@@ -108,7 +110,10 @@ public class SPSConnection implements ISPSConnection {
 						}
 					}
 				} else if (packet.packet instanceof LoginSuccessPacket) {
+					ConsoleIO.println("SPSConnection::publication Received LoginSuccessPacket. Subscribe to 'ingame'");
 					subscribeToChannel("ingame");
+					packetSession.setChannel("ingame");
+					unsubscribeFromChannel("login");
 				}
 				
 				if (listeners.containsKey(username)) {					
@@ -197,13 +202,20 @@ public class SPSConnection implements ISPSConnection {
 
 	@Override
 	public void subscribeToArea(String channel, int x, int y, int AoI) {
-		ConsoleIO.println("Subscribing to <" + x + "," + y + "> with an area of " + AoI + " on channel " + channel);
+		ConsoleIO.println("SPSConnection::subscribetoArea => Subscribing to <" + x + "," + y + "> with an area of " + AoI + " on channel " + channel);
 		socket.emit("subscribe", channel, x, y, AoI);
 	}
 
 	@Override
-	public void unsubscribed(String channel) {
-		ConsoleIO.println("Unsubscribing from channel " + channel);
+	public void unsubscribeFromChannel(String channel) {
+		ConsoleIO.println("SPSConnection::unsubscribeFromChannel => Unsubscribing from channel " + channel);
+		socket.emit("unsubscribe", channel);
+	}
+
+
+	@Override
+	public void unsubscribeFromArea(String channel) {
+		ConsoleIO.println("SPSConnection::unsubscribeFromArea => unsubscribing from " + channel);
 		socket.emit("unsubscribe", channel);
 	}
 
@@ -266,5 +278,12 @@ public class SPSConnection implements ISPSConnection {
 	@Override
 	public int getPort() {
 		return this.SPSPort;
+	}
+
+
+	@Override
+	public void receivePacketSession(IPacketSession session) {
+		ConsoleIO.println("SPSConnection::receivePacketSession => Received packet session " + session.getClass().getSimpleName());
+		this.packetSession = session;		
 	}
 }

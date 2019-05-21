@@ -24,7 +24,7 @@ public class ClientToSPSProxy implements IProxySessionNew {
 		this.clientPacketBehaviours = new ClientSessionPacketBehaviours(this);
 		this.clientPacketBehaviours.registerDefaultBehaviours(clientSession);
 		this.clientPacketBehaviours.registerForwardingBehaviour();
-	//	ConsoleIO.println("ClientToSPSProxy::setting packet behaviours of cclient session");		
+	//	ConsoleIO.println("ClientToSPSProxy::setting packet behaviours of client session");		
 		this.clientSession.setPacketBehaviours(this.clientPacketBehaviours);
 	}
 	

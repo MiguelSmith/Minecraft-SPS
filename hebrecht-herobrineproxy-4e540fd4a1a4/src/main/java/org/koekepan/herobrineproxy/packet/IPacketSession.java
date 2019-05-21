@@ -6,4 +6,5 @@ public interface IPacketSession {
 	public void send(Packet packet);
 	public void setChannel(String channel);
 	public void subscribeSession(String channel);
+	public void unsubscribeSession(String channel);
 }
