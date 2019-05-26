@@ -118,7 +118,7 @@ public class SPSConnection implements ISPSConnection {
 				
 				if (listeners.containsKey(username)) {					
 					//listeners.get(username).packetReceived(packet.packet);
-					ConsoleIO.println("SPSConnection::publication => Sending packet <"+packet.packet.getClass().getSimpleName()+"> for player <"+username+"> at <"+x+":"+y+":"+radius+">");
+					//ConsoleIO.println("SPSConnection::publication => Sending packet <"+packet.packet.getClass().getSimpleName()+"> for player <"+username+"> at <"+x+":"+y+":"+radius+">");
 					
 					listeners.get(username).sendPacket(packet.packet);
 				} else {

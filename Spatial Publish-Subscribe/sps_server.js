@@ -70,7 +70,8 @@ io.on('connection', function(socket) {
     connectionID++;
     console.log("Someone connected. Sending connectionID <" + connectionID + ">");
     socket.emit("ID", connectionID)
-    socketToConnectionIDMap[socket] = connectionID;
+    socketToConnectionIDMap[socket.id] = connectionID;
+    console.log(socketToConnectionIDMap);
     connectionInfoList[connectionID] =
         {
             id: connectionID,                             // id
@@ -84,7 +85,7 @@ io.on('connection', function(socket) {
     //handle a disconnect
     socket.on('disconnect', function(id)
     {
-        var id = socketToConnectionIDMap[socket];
+        var id = socketToConnectionIDMap[socket.id];
         delete connectionInfoList[id];
         console.log("Connection <"+id+"> has disconnected");
 
@@ -94,11 +95,22 @@ io.on('connection', function(socket) {
     // publish message to subscribers
     socket.on('publish', function(connectionID, player, x, y, radius, payload, channel)
     {
-        console.log("Sending packet from "+connectionID+" to channel "+channel);
+        //console.log("Sending packet from "+connectionID+" to channel "+channel);
+
+        if (!subscriberList.hasOwnProperty(channel)) {
+            console.log("Trying to publish to a channel that does not exist: " + channel);
+            return false;
+        }
 
         for (var keys in subscriberList[channel]) {
+            console.log("Key: " + keys)
             var sub = subscriberList[channel][keys];
-            if (_contains(sub, x, y, radius) && (sub.connectionID != connectionID)) {
+            console.log(sub);
+            
+            if (sub.connectionID == connectionID)
+                continue;
+
+            if (_contains(sub, x, y, radius)) {
                 //console.log("Publishing to " + sub.connectionID);
                 socket.broadcast.to(connectionInfoList[sub.connectionID].socket.id).emit('publication', connectionID, player, x, y, radius, payload, channel);
             }
@@ -109,8 +121,8 @@ io.on('connection', function(socket) {
     });
 
     socket.on('subscribe', function(channel, x, y, AoI) {
-        var connectionID = socketToConnectionIDMap[socket];
-        console.log("Received subscription request from " + connectionID);
+        var connectionID = socketToConnectionIDMap[socket.id];
+        console.log("Received subscription request from " + connectionID + " for channel " + channel);
 
         var connection = connectionInfoList[connectionID];
 
@@ -150,10 +162,38 @@ io.on('connection', function(socket) {
         }
 
         subscriberList[channel][subID] = pack;
+        console.log(subscriberList);
     });
 
     socket.on("unsubscribe", function (channel, x, y, AoI) {
         // TODO: unsubscribe from channel and remove subIDs from channel list
+        var connectionID = socketToConnectionIDMap[socket.id];
+        console.log("Received unsubscribe request from " + connectionID + " for channel " + channel);
+
+        var connection = connectionInfoList[connectionID];
+
+        // check to see whether it is an unsubscribe from a channel or from an area/point
+        if ((x ==undefined) && (y == undefined)) {
+            x = connection.x;
+            y = connection.y
+        }
+
+        //  check seperately for AoI because it could be a change in subscription for their current location
+        if (AoI == undefined) {
+            AoI = connection.AoIRadius;
+        }
+
+        for (var subID in connection.subscriptions[channel]) {
+            var sub = connection.subscriptions[channel][subID];
+
+            if (sub.evaluate(x,y,AoI) == subType.DUPLICATE) {
+                console.log("Unsubscribe subID " + subID + " from channel " + channel);
+                delete connection.subscriptions[channel][subID];
+                delete subscriberList[channel][subID];
+            }
+        }
+
+        connectionInfoList[connectionID] = connection;
     });
 
     /*
@@ -171,7 +211,7 @@ io.on('connection', function(socket) {
         var channel = temp[6];
 
 
-        var refId = socketToConnectionIDMap[socket];
+        var refId = socketToConnectionIDMap[socket.id];
         var connectionInfo = connectionInfoList[refId];
 
         switch (query)

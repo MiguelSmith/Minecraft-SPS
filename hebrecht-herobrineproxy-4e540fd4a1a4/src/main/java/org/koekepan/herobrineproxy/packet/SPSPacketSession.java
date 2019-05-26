@@ -1,5 +1,6 @@
 package org.koekepan.herobrineproxy.packet;
 
+import org.koekepan.herobrineproxy.ConsoleIO;
 import org.koekepan.herobrineproxy.sps.ISPSConnection;
 import org.koekepan.herobrineproxy.sps.SPSPacket;
 
@@ -49,6 +50,7 @@ public class SPSPacketSession implements IPacketSession {
 
 	@Override
 	public void subscribeSession(String channel) {
+		ConsoleIO.println("Session to subscribe to : "+session.getClass().getSimpleName());
 		session.subscribeToChannel(channel);	
 	}
 	

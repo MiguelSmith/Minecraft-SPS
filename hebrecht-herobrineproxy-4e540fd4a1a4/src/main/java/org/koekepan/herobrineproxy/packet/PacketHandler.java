@@ -122,14 +122,14 @@ public class PacketHandler implements Runnable, PacketListener {
 				
 				packet = outgoingPackets.poll();
 				
-				//ConsoleIO.println("\n\n Packet: " + packet.getClass().getSimpleName() + " to "+ packetSession.getClass().getSimpleName() +"\n ");
+				ConsoleIO.println("\n\n Packet: " + packet.getClass().getSimpleName() + " to "+ packetSession.getClass().getSimpleName() +"\n ");
 				
 				packetSession.send(packet);
 				
 				// if server receives instance of LoginPacketSuccess then switch to ingame protocol
 				// NOTE: client will set PacketSession, not SPSPacketSession, so subscribing needs to happen from SPSConnection
 				if (packet instanceof LoginSuccessPacket) {
-					ConsoleIO.println("PacketHandler::run Changing channel to 'ingame'");
+					ConsoleIO.println("PacketHandler::run Changing channel to 'ingame' " + packetSession.getClass().getSimpleName());
 					packetSession.setChannel("ingame");
 					packetSession.subscribeSession("ingame");
 					// TODO: see if this is necessary because the server might need to login multiple clients. 
