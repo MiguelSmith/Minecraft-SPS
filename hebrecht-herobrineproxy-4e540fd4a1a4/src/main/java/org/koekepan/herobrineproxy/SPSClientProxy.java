@@ -48,9 +48,8 @@ public class SPSClientProxy {
 		// setup proxy server and add listener to create and store/discard proxy sessions as clients connect/disconnect
 		server = new Server(proxyHost, proxyPort, HerobrineProxyProtocol.class, new TcpSessionFactory());	
 		this.spsConnection = new SPSConnection(this.spsHost, this.spsPort );
-		this.spsConnection.connect();
-		spsConnection.subscribeToChannel("login");
-		spsConnection.subscribeToChannel("status");
+		this.spsConnection.connect("client");
+		spsConnection.subscribeToChannel("lobby");
 		
 		server.addListener(new ServerAdapter() {
 			

@@ -56,7 +56,7 @@ public class SPSSession implements IServerSession {
 	
 	private void initialiseSession() {		
 		this.packetSession = new SPSPacketSession(spsClient);
-		this.packetSession.setChannel("login");
+		this.packetSession.setChannel("lobby");
 		this.packetHandler = new PacketHandler(new DefaultPacketBehaviours(), packetSession);
 		packetFuture = packetExecutor.scheduleAtFixedRate(this.packetHandler, 0, 1, TimeUnit.MILLISECONDS);
 	}

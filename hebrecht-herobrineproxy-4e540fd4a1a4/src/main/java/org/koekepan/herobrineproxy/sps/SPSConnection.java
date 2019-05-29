@@ -20,6 +20,7 @@ import org.koekepan.herobrineproxy.session.ISession;
 
 import com.github.steveice10.mc.protocol.MinecraftProtocol;
 import com.github.steveice10.mc.protocol.data.SubProtocol;
+import com.github.steveice10.mc.protocol.packet.ingame.server.entity.player.ServerPlayerPositionRotationPacket;
 import com.github.steveice10.mc.protocol.packet.login.client.LoginStartPacket;
 import com.github.steveice10.mc.protocol.packet.login.server.LoginSuccessPacket;
 import com.github.steveice10.packetlib.Session;
@@ -41,6 +42,8 @@ public class SPSConnection implements ISPSConnection {
 	String SPSHost;
 	private Socket socket;
 	int connectionID;
+	private String type;
+	
 	private SPSProxyProtocol protocol;
 	//private PacketProtocol protocol;
 	private Map<String, ISession> listeners = new HashMap<String, ISession>();
@@ -80,6 +83,17 @@ public class SPSConnection implements ISPSConnection {
 				receiveConnectionID((int) data[0]);
 			}
 		});
+		
+		socket.on("type", new Emitter.Listener() {
+			@Override
+			public void call(Object... data) {
+				ConsoleIO.println("type: " + type);
+				if (type == "server") {
+					socket.emit("type", true);
+					subscribeToChannel("lobby");
+				}
+			}
+		});
 
 		socket.on("publication", new Emitter.Listener() {
 			@Override
@@ -110,10 +124,10 @@ public class SPSConnection implements ISPSConnection {
 						}
 					}
 				} else if (packet.packet instanceof LoginSuccessPacket) {
-					ConsoleIO.println("SPSConnection::publication Received LoginSuccessPacket. Subscribe to 'ingame'");
+					ConsoleIO.println("SPSConnection::publication Received ServerPlayerPositionRotation packet. Subscribe to 'ingame'");
 					subscribeToChannel("ingame");
 					packetSession.setChannel("ingame");
-					unsubscribeFromChannel("login");
+					unsubscribeFromChannel("lobby");
 				}
 				
 				if (listeners.containsKey(username)) {					
@@ -130,7 +144,8 @@ public class SPSConnection implements ISPSConnection {
 
 
 	@Override
-	public void connect() {
+	public void connect(String type) {
+		setType(type);
 		if (initializeConnection()) {
 			initialiseListeners();
 			socket.connect();
@@ -285,5 +300,11 @@ public class SPSConnection implements ISPSConnection {
 	public void receivePacketSession(IPacketSession session) {
 		ConsoleIO.println("SPSConnection::receivePacketSession => Received packet session " + session.getClass().getSimpleName());
 		this.packetSession = session;		
+	}
+
+
+	@Override
+	public void setType(String type) {
+		this.type = type;
 	}
 }

@@ -95,10 +95,7 @@ public class SPSServerProxy implements IProxySessionConstructor {
 
 	// initializes the proxy
 	public void bind() {
-		this.spsConnection.connect();
-		// subscribe to the login and status channel immediately
-		this.spsConnection.subscribeToChannel("login");
-		this.spsConnection.subscribeToChannel("status");
+		this.spsConnection.connect("server");
 	}
 
 	

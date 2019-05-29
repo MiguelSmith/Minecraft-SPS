@@ -33,7 +33,7 @@ public interface ISPSConnection {
 	public String getHost();
 	public int getPort();
 	
-	public void connect();
+	public void connect(String type);
 	public void disconnect();
 	// Receiving functions
 	public SPSPacket receivePublication(Object... data);  // "publication"
@@ -51,4 +51,5 @@ public interface ISPSConnection {
 	public void addListener(ISession listener);
 	public void removeListener(ISession listener);
 	public void receivePacketSession(IPacketSession session);
+	public void setType(String type);
 }

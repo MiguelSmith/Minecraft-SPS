@@ -31,6 +31,9 @@ var subType =
     "DUPLICATE":2
 }
 
+// is there a lobby server
+var lobby = false;
+
 //buffer queue for packets
 var packets = [];
 var packStrings = [];
@@ -70,6 +73,14 @@ io.on('connection', function(socket) {
     connectionID++;
     console.log("Someone connected. Sending connectionID <" + connectionID + ">");
     socket.emit("ID", connectionID)
+
+    // if lobby server does not exist, emit "type" to determine lobby server availablity
+    // callback happens in the "type" event listener
+    if (!lobby) {
+        console.log("Determining connection type");
+        socket.emit("type", lobby);
+    }
+
     socketToConnectionIDMap[socket.id] = connectionID;
     console.log(socketToConnectionIDMap);
     connectionInfoList[connectionID] =
@@ -81,6 +92,13 @@ io.on('connection', function(socket) {
             AoIRadius: 1000,                              // radius of AoI (currently make it large enough that they will always send to each other)
             subscriptions: {}                             // channels to which connection is subscribed
         };
+
+    // handle type callback
+    // this is followed on the server proxy side by a subscription to channel "lobby"
+    socket.on("type", function(connected) {
+        console.log("Lobby: " + connected);
+        lobby = connected;
+    });
 
     //handle a disconnect
     socket.on('disconnect', function(id)
@@ -103,10 +121,10 @@ io.on('connection', function(socket) {
         }
 
         for (var keys in subscriberList[channel]) {
-            console.log("Key: " + keys)
+            //console.log("Key: " + keys)
             var sub = subscriberList[channel][keys];
-            console.log(sub);
-            
+            //console.log(sub);
+
             if (sub.connectionID == connectionID)
                 continue;
 
@@ -162,7 +180,7 @@ io.on('connection', function(socket) {
         }
 
         subscriberList[channel][subID] = pack;
-        console.log(subscriberList);
+        //console.log(subscriberList);
     });
 
     socket.on("unsubscribe", function (channel, x, y, AoI) {

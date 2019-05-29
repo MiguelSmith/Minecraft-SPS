@@ -3,6 +3,7 @@ package org.koekepan.herobrineproxy.packet;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import com.github.steveice10.mc.protocol.packet.ingame.server.entity.player.ServerPlayerPositionRotationPacket;
 import com.github.steveice10.mc.protocol.packet.login.server.LoginSuccessPacket;
 import com.github.steveice10.packetlib.packet.Packet;
 
@@ -122,7 +123,7 @@ public class PacketHandler implements Runnable, PacketListener {
 				
 				packet = outgoingPackets.poll();
 				
-				ConsoleIO.println("\n\n Packet: " + packet.getClass().getSimpleName() + " to "+ packetSession.getClass().getSimpleName() +"\n ");
+				//ConsoleIO.println("\n\n Packet: " + packet.getClass().getSimpleName() + " to "+ packetSession.getClass().getSimpleName() +"\n ");
 				
 				packetSession.send(packet);
 				
@@ -132,9 +133,6 @@ public class PacketHandler implements Runnable, PacketListener {
 					ConsoleIO.println("PacketHandler::run Changing channel to 'ingame' " + packetSession.getClass().getSimpleName());
 					packetSession.setChannel("ingame");
 					packetSession.subscribeSession("ingame");
-					// TODO: see if this is necessary because the server might need to login multiple clients. 
-					// this is just proof of joining and leaving channels
-					packetSession.unsubscribeSession("login");
 				}
 			}			
 		} catch (Exception e) {
