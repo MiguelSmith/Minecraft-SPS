@@ -127,6 +127,7 @@ public class PacketHandler implements Runnable, PacketListener {
 				
 				packetSession.send(packet);
 				
+				/*
 				// if server receives instance of LoginPacketSuccess then switch to ingame protocol
 				// NOTE: client will set PacketSession, not SPSPacketSession, so subscribing needs to happen from SPSConnection
 				if (packet instanceof LoginSuccessPacket) {
@@ -134,6 +135,7 @@ public class PacketHandler implements Runnable, PacketListener {
 					packetSession.setChannel("ingame");
 					packetSession.subscribeSession("ingame");
 				}
+				*/
 			}			
 		} catch (Exception e) {
 			ConsoleIO.println("PacketHandler::run => Exception occurred while processing packet <"+packet.getClass().getSimpleName()+">");

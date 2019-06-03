@@ -11,6 +11,8 @@ public class SPSPacketSession implements IPacketSession {
 	private String username;
 	private String channel;
 	
+	private boolean login;
+	
 	private ISPSConnection session;
 	
 	public SPSPacketSession(ISPSConnection session) {
@@ -18,8 +20,6 @@ public class SPSPacketSession implements IPacketSession {
 		
 		// initialise channel to "lobby"
 		this.channel = "lobby";
-		
-		sendSession();
 	}
 		
 	
@@ -27,8 +27,6 @@ public class SPSPacketSession implements IPacketSession {
 		this.session = client;
 		this.username = username;
 		this.channel = channel;
-		
-		sendSession();
 	}
 	
 	@Override
@@ -40,6 +38,12 @@ public class SPSPacketSession implements IPacketSession {
 	
 	public void setUsername(String username) {
 		this.username = username;
+		
+		sendSession();
+	}
+	
+	public String getUsername() {
+		return username;
 	}
 
 
@@ -58,13 +62,25 @@ public class SPSPacketSession implements IPacketSession {
 	}
 	
 	private void sendSession () {
-		this.session.receivePacketSession(this);
+		this.session.receivePacketSession(this, username);
 	}
 
 
 	@Override
 	public void unsubscribeSession(String channel) {
 		session.unsubscribeFromChannel(channel);		
+	}
+
+
+	@Override
+	public void setLogin(boolean login) {
+		this.login = login;
+	}
+
+
+	@Override
+	public boolean getLogin() {
+		return this.login;
 	}
 
 }

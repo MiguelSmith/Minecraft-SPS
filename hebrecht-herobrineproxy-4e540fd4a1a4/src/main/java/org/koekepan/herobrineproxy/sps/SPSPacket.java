@@ -9,8 +9,6 @@ public class SPSPacket {
 	public int radius;
 	public String channel;
 	public Packet packet;
-
-
 	
 	public SPSPacket(Packet packet, String username, String channel) {
 		this.username = username;

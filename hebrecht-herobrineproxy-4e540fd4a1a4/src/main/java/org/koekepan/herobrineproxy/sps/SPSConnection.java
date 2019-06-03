@@ -20,8 +20,12 @@ import org.koekepan.herobrineproxy.session.ISession;
 
 import com.github.steveice10.mc.protocol.MinecraftProtocol;
 import com.github.steveice10.mc.protocol.data.SubProtocol;
+import com.github.steveice10.mc.protocol.packet.ingame.server.ServerChatPacket;
+import com.github.steveice10.mc.protocol.packet.ingame.server.ServerJoinGamePacket;
+import com.github.steveice10.mc.protocol.packet.ingame.server.ServerPlayerListEntryPacket;
 import com.github.steveice10.mc.protocol.packet.ingame.server.entity.player.ServerPlayerPositionRotationPacket;
 import com.github.steveice10.mc.protocol.packet.login.client.LoginStartPacket;
+import com.github.steveice10.mc.protocol.packet.login.server.LoginSetCompressionPacket;
 import com.github.steveice10.mc.protocol.packet.login.server.LoginSuccessPacket;
 import com.github.steveice10.packetlib.Session;
 import com.github.steveice10.packetlib.io.NetInput;
@@ -41,14 +45,15 @@ public class SPSConnection implements ISPSConnection {
 	int SPSPort;
 	String SPSHost;
 	private Socket socket;
-	int connectionID;
+	private int connectionID;
 	private String type;
 	
 	private SPSProxyProtocol protocol;
 	//private PacketProtocol protocol;
 	private Map<String, ISession> listeners = new HashMap<String, ISession>();
+	private Map<String,IPacketSession> sessions = new HashMap<String, IPacketSession>();
 	private IProxySessionConstructor sessionConstructor;
-	private IPacketSession packetSession;
+	//private IPacketSession packetSession;
 	
 	public SPSConnection(String SPSHost, int SPSPort) {
 		this.SPSHost = SPSHost;
@@ -104,6 +109,8 @@ public class SPSConnection implements ISPSConnection {
 				int y = packet.y;
 				int radius = packet.radius;
 				
+				// TODO: look at possible polymorphic implementation of this. Create new interface to handle publish-time packet behaviours
+				// eg. packet.publish() -> do checks or nothing depending on packet type instead of "instanceof" implementation
 				if (packet.packet instanceof EstablishConnectionPacket) {
 					EstablishConnectionPacket loginPacket = (EstablishConnectionPacket)packet.packet;
 					//LoginStartPacket loginPacket = (LoginStartPacket)packet.packet;
@@ -123,16 +130,23 @@ public class SPSConnection implements ISPSConnection {
 							ConsoleIO.println("SPSConnection::publication => Received a packet for an unknown session <"+username+">");
 						}
 					}
-				} else if (packet.packet instanceof LoginSuccessPacket) {
-					ConsoleIO.println("SPSConnection::publication Received ServerPlayerPositionRotation packet. Subscribe to 'ingame'");
-					subscribeToChannel("ingame");
-					packetSession.setChannel("ingame");
-					unsubscribeFromChannel("lobby");
-				}
-				
-				if (listeners.containsKey(username)) {					
+				} else if (listeners.containsKey(username)) {					
 					//listeners.get(username).packetReceived(packet.packet);
 					//ConsoleIO.println("SPSConnection::publication => Sending packet <"+packet.packet.getClass().getSimpleName()+"> for player <"+username+"> at <"+x+":"+y+":"+radius+">");
+				
+					if (!sessions.get(username).getLogin()) {
+						ConsoleIO.println("Client login: " + sessions.get(username).getLogin());
+						if (packet.packet instanceof ServerJoinGamePacket) {
+							ConsoleIO.println("SPSConnection::publication Received ServerJoinGame packet. Subscribe to 'ingame'");
+							subscribeToChannel("ingame");
+							sessions.get(username).setChannel("ingame");
+						} else if (packet.packet instanceof ServerChatPacket) { 
+							// the last single "login" packet received by client before chunk data starts flowing in
+							ConsoleIO.println("SPSConnection::publication Received ServerChat packet. Unsubscribe from 'lobby' channel");
+							unsubscribeFromChannel("lobby");
+							sessions.get(username).setLogin(true);
+						}
+					}
 					
 					listeners.get(username).sendPacket(packet.packet);
 				} else {
@@ -198,14 +212,43 @@ public class SPSConnection implements ISPSConnection {
 	
 	
 	@Override
-	public void publish(SPSPacket packet) { // , String username, String channel) {
-		
+	public void publish(SPSPacket packet) {		
 		//convert to JSON
 		Gson gson = new Gson();
 		byte[] payload = this.packetToBytes(packet.packet);
 		String json = gson.toJson(payload);
-		//ConsoleIO.println("Connection <"+connectionID+"> sent packet <"+packet.packet.getClass().getSimpleName()+"> on channel <"+packet.channel+">");
-		socket.emit("publish", connectionID, packet.username, packet.x, packet.y, packet.radius, json, packet.channel);
+		
+		try {
+			IPacketSession session = this.sessions.get(packet.username);
+			
+			if (!session.getLogin()) {
+				ConsoleIO.println("Session: " + session.getLogin());
+				
+				switch (type) {
+				case "client":
+						// Do we need to do something for client here?
+					break;
+					
+				case "server" :
+					if (packet.packet instanceof ServerPlayerListEntryPacket) {
+						ConsoleIO.println("SPSConnection::publish Changing channel to 'ingame' " + session.getClass().getSimpleName());
+						session.setChannel("ingame"); // look at changing channel implementation to packet specific channels instead of packet session specific channel 
+						session.subscribeSession("ingame");
+						session.setLogin(true);
+					}				
+					break;
+	
+				default:
+					ConsoleIO.println("Type has not yet been defined or has been corrupted.");
+					break;
+				}
+			}
+		} catch (Exception e) {
+			ConsoleIO.println("Packet session has not yet been initialised.");
+		} finally {			
+			//ConsoleIO.println("Connection <"+connectionID+"> sent packet <"+packet.packet.getClass().getSimpleName()+"> on channel <"+packet.channel+">");
+			socket.emit("publish", connectionID, packet.username, packet.x, packet.y, packet.radius, json, packet.channel);			
+		}
 	}
 
 
@@ -297,9 +340,9 @@ public class SPSConnection implements ISPSConnection {
 
 
 	@Override
-	public void receivePacketSession(IPacketSession session) {
-		ConsoleIO.println("SPSConnection::receivePacketSession => Received packet session " + session.getClass().getSimpleName());
-		this.packetSession = session;		
+	public void receivePacketSession(IPacketSession session, String username) {
+		ConsoleIO.println("SPSConnection::receivePacketSession => Received packet session " + session.getClass().getSimpleName() + " for username " + username);
+		this.sessions.put(username, session);		
 	}
 
 

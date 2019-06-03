@@ -50,6 +50,6 @@ public interface ISPSConnection {
 	// functional functions
 	public void addListener(ISession listener);
 	public void removeListener(ISession listener);
-	public void receivePacketSession(IPacketSession session);
+	public void receivePacketSession(IPacketSession session, String username);
 	public void setType(String type);
 }

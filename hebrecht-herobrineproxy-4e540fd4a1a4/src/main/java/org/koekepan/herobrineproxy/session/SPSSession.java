@@ -64,7 +64,7 @@ public class SPSSession implements IServerSession {
 
 	@Override
 	public void setUsername(String username) {
-		ConsoleIO.println("SPSSession::setUsername => Settting session username to <"+username+">");
+		ConsoleIO.println("SPSSession::setUsername => Setting session username to <"+username+">");
 		this.username = username;
 		this.packetSession.setUsername(username);
 		this.spsClient.addListener(this);

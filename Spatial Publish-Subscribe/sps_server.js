@@ -77,12 +77,12 @@ io.on('connection', function(socket) {
     // if lobby server does not exist, emit "type" to determine lobby server availablity
     // callback happens in the "type" event listener
     if (!lobby) {
-        console.log("Determining connection type");
+        console.log("Querying potential lobby server");
         socket.emit("type", lobby);
     }
 
     socketToConnectionIDMap[socket.id] = connectionID;
-    console.log(socketToConnectionIDMap);
+    //console.log(socketToConnectionIDMap);
     connectionInfoList[connectionID] =
         {
             id: connectionID,                             // id
@@ -148,7 +148,7 @@ io.on('connection', function(socket) {
 
         // create subID for a channel if it doesn't exist
         if (!channelSubID.hasOwnProperty(channel)) {
-            console.log("Creating entry for channel " + channel);
+            //console.log("Creating entry for channel " + channel);
             channelSubID[channel] = -1;
         }
         channelSubID[channel]++;
@@ -158,16 +158,16 @@ io.on('connection', function(socket) {
         // NOTE: since this is a rough implementation, this crude method is used since x will always
         // be undefined when it is a publication that is not spatially important
         if (x == undefined) {
-            console.log("Subscribing to <" + connection.x + "," + connection.y + "> with an AoI of " + connection.AoIRadius + ". SubID: "+subID);
+            //console.log("Subscribing to <" + connection.x + "," + connection.y + "> with an AoI of " + connection.AoIRadius + ". SubID: "+subID);
             var pack = new VAST.sub(connectionID, subID, connection.x, connection.y, connection.AoIRadius, channel);
         } else {
-            console.log("Subscribing to <" + x + "," + y + "> with an AoI of " + AoI + ". SubID: "+subID)
+            //console.log("Subscribing to <" + x + "," + y + "> with an AoI of " + AoI + ". SubID: "+subID)
             var pack = new VAST.sub(connectionID, subID, x, y, AoI, channel);
         }
 
         // create subscription channel if it doesn't exist
         if (!connection.subscriptions.hasOwnProperty(channel)) {
-            console.log("Creating channel subscription for " + connection.id + " for channel " + channel);
+            //console.log("Creating channel subscription for " + connection.id + " for channel " + channel);
             connection.subscriptions[channel] = {};
         }
         connection.subscriptions[channel][subID] = pack;

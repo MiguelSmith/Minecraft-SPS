@@ -35,4 +35,18 @@ public class PacketSession implements IPacketSession {
 	@Override
 	public void unsubscribeSession(String channel) {		
 	}
+
+
+	@Override
+	public void setLogin(boolean login) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public boolean getLogin() {
+		// TODO Auto-generated method stub
+		return true;
+	}
 }
