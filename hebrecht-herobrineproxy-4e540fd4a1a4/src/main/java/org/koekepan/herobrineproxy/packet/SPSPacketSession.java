@@ -17,9 +17,6 @@ public class SPSPacketSession implements IPacketSession {
 	
 	public SPSPacketSession(ISPSConnection session) {
 		this.session = session;
-		
-		// initialise channel to "lobby"
-		this.channel = "lobby";
 	}
 		
 	

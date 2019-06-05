@@ -39,12 +39,6 @@ public class ClientToSPSProxy implements IProxySessionNew {
 	public void setUsername(String username) {
 		clientSession.setUsername(username);
 		serverSession.setUsername(username);
-		
-		subscribeToLobby(username);
-	}
-	
-	public void subscribeToLobby(String username) {
-		spsConnection.subscribeToChannel("lobby", username);
 	}
 
 	@Override

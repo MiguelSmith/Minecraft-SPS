@@ -49,4 +49,11 @@ public class PacketSession implements IPacketSession {
 		// TODO Auto-generated method stub
 		return true;
 	}
+
+
+	@Override
+	public String getUsername() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

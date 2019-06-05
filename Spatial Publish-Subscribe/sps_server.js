@@ -76,28 +76,24 @@ io.on('connection', function(socket) {
 
     // if lobby server does not exist, emit "type" to determine lobby server availablity
     // callback happens in the "type" event listener
-    if (!lobby) {
-        console.log("Querying potential lobby server");
-        socket.emit("type", lobby);
-    }
+    socket.emit("type", lobby);
 
     socketToConnectionIDMap[socket.id] = connectionID;
     //console.log(socketToConnectionIDMap);
     connectionInfoList[connectionID] =
         {
-            id: connectionID,                             // id
-            socket: socket,                               // socket
-            x: Math.floor((Math.random() * 300) - 150),   // x coordinate of client
-            y: Math.floor((Math.random() * 300) - 150),   // y coordinate of client
-            AoIRadius: 1000,                              // radius of AoI (currently make it large enough that they will always send to each other)
-            subscriptions: {}                             // channels to which connection is subscribed
+            id: connectionID,                                   // id
+            socket: socket,                                     // socket
+            x: 0,                                               // x coordinate of client
+            y: 0,                                               // y coordinate of client
+            AoIRadius: 10                                       // radius of AoI (currently make it large enough that they will always send to each other)
         };
 
     // handle type callback
     // this is followed on the server proxy side by a subscription to channel "lobby"
-    socket.on("type", function(connected) {
-        console.log("Lobby: " + connected);
-        lobby = connected;
+    socket.on("type", function(type) {
+        lobby = type == "server" ? true : false;
+        console.log("Lobby: " + lobby);
     });
 
     //handle a disconnect
@@ -113,6 +109,7 @@ io.on('connection', function(socket) {
     // publish message to subscribers
     socket.on('publish', function(connectionID, player, x, y, radius, payload, channel, packetName)
     {
+
     //console.log("Attempting to send packet " + packetName + " from "+connectionID+" to channel " + channel + " for player " + player);
 
         if (!subscriberList.hasOwnProperty(channel)) {
@@ -121,27 +118,34 @@ io.on('connection', function(socket) {
         }
 
         for (var keys in subscriberList[channel]) {
-            //console.log("Key: " + keys)
             var sub = subscriberList[channel][keys];
+
+            //console.log("Key: " + keys)
             //console.log(sub);
 
             if (sub.connectionID == connectionID)
                 continue;
 
-            if (_contains(sub, x, y, radius) && (player == sub.name) || (sub.name == "server")) {
-                //console.log("Publishing to " + sub.connectionID);
+            if (_contains(sub, x, y, radius)) {
+                // if the lobby channel is getting the message, make sure to use the given username.
+                // else use the subscription username
+                // only necessary for aggregation of packets so we won't implement it here.
+                // player = channel == "lobby" ? player : sub.name;
+                // console.log("Publishing to " + sub.connectionID);
+
                 //console.log("Confirming sending packet " + packetName + " from "+connectionID+" to channel " + channel + " for player " + player);
+
                 socket.broadcast.to(connectionInfoList[sub.connectionID].socket.id).emit('publication', connectionID, player, x, y, radius, payload, channel);
             }
         }
 
 
-        return false;
+        return true;;
     });
 
     socket.on('subscribe', function(channel, name, x, y, AoI) {
         var connectionID = socketToConnectionIDMap[socket.id];
-        console.log("Received subscription request from " + connectionID + " for channel " + channel);
+        console.log("Received subscription request from " + connectionID + " for channel " + channel + " for " + name);
 
         var connection = connectionInfoList[connectionID];
 
@@ -166,6 +170,7 @@ io.on('connection', function(socket) {
             var pack = new VAST.sub(connectionID, subID, x, y, AoI, channel, name);
         }
 
+        /*
         // create subscription channel if it doesn't exist
         if (!connection.subscriptions.hasOwnProperty(channel)) {
             //console.log("Creating channel subscription for " + connection.id + " for channel " + channel);
@@ -174,6 +179,7 @@ io.on('connection', function(socket) {
         connection.subscriptions[channel][subID] = pack;
 
         connectionInfoList[connectionID] = connection;
+        */
 
         // if this is the first subscription to the channel, create key
         if (!subscriberList.hasOwnProperty(channel)) {
@@ -182,6 +188,8 @@ io.on('connection', function(socket) {
 
         subscriberList[channel][subID] = pack;
         //console.log(subscriberList);
+
+        return true;
     });
 
     socket.on("unsubscribe", function (channel, player, x, y, AoI) {
@@ -202,17 +210,16 @@ io.on('connection', function(socket) {
             AoI = connection.AoIRadius;
         }
 
-        for (var subID in connection.subscriptions[channel]) {
-            var sub = connection.subscriptions[channel][subID];
+        for (var subID in subscriberList[channel]) {
+            var sub = subscriberList[channel][subID];
 
-            if ((sub.evaluate(x,y,AoI) == subType.DUPLICATE) && (sub.name == player || sub.name == "server")) {
+            if ((sub.evaluate(x,y,AoI) == subType.DUPLICATE) && (player == sub.name)) {
                 console.log("Unsubscribe subID " + subID + " from channel " + channel);
-                delete connection.subscriptions[channel][subID];
                 delete subscriberList[channel][subID];
             }
         }
 
-        connectionInfoList[connectionID] = connection;
+        return true;
     });
 
     /*

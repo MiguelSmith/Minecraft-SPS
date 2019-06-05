@@ -54,6 +54,7 @@ public class SPSClientProxy {
 			
 			@Override
 			public void sessionAdded(SessionAddedEvent event) {
+				spsConnection.checkLobbyConnection();
 				Session session = event.getSession();
 				ConsoleIO.println("SPSClientProxy::sessionAdded => A SessionAdded event occured from <"+session.getHost()+":"+session.getPort()+"> to server <"+spsHost+":"+spsPort+">");
 				IClientSession clientSession = new ClientSession(session);

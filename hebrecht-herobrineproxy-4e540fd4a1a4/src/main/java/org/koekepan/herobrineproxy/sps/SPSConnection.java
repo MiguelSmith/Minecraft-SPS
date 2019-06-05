@@ -47,6 +47,7 @@ public class SPSConnection implements ISPSConnection {
 	private Socket socket;
 	private int connectionID;
 	private String type;
+	private int numLogins;
 	
 	private SPSProxyProtocol protocol;
 	//private PacketProtocol protocol;
@@ -59,6 +60,7 @@ public class SPSConnection implements ISPSConnection {
 		this.SPSHost = SPSHost;
 		this.SPSPort = SPSPort;
 		this.protocol = new SPSProxyProtocol();
+		numLogins = 0;
 	}
 	
 	
@@ -94,7 +96,7 @@ public class SPSConnection implements ISPSConnection {
 			public void call(Object... data) {
 				ConsoleIO.println("type: " + type);
 				if (type == "server") {
-					socket.emit("type", true);
+					socket.emit("type", type);
 					subscribeToChannel("lobby", type);
 				}
 			}
@@ -135,15 +137,18 @@ public class SPSConnection implements ISPSConnection {
 					//ConsoleIO.println("SPSConnection::publication => Sending packet <"+packet.packet.getClass().getSimpleName()+"> for player <"+username+"> at <"+x+":"+y+":"+radius+">");
 				
 					if (!sessions.get(username).getLogin()) {
-						ConsoleIO.println("Client login: " + sessions.get(username).getLogin());
+						ConsoleIO.println("Login: " + sessions.get(username).getLogin());
 						if (packet.packet instanceof ServerJoinGamePacket) {
 							ConsoleIO.println("SPSConnection::publication Received ServerJoinGame packet. Subscribe to 'ingame'");
 							subscribeToChannel("ingame", username);
 							sessions.get(username).setChannel("ingame");
 						} else if (packet.packet instanceof ServerChatPacket) { 
 							// the last single "login" packet received by client before chunk data starts flowing in
-							ConsoleIO.println("SPSConnection::publication Received ServerChat packet. Unsubscribe from 'lobby' channel");
-							unsubscribeFromChannel("lobby", username);
+							numLogins--;
+							if (numLogins == 0) {
+								ConsoleIO.println("No more logins to process. Unsubscribe from lobby channel");
+								unsubscribeFromChannel("lobby", type);
+							}
 							sessions.get(username).setLogin(true);
 						}
 					}
@@ -222,20 +227,21 @@ public class SPSConnection implements ISPSConnection {
 			IPacketSession session = this.sessions.get(packet.username);
 			
 			if (!session.getLogin()) {
-				ConsoleIO.println("Session: " + session.getLogin());
 				
 				switch (type) {
 				case "client":
 						// Do we need to do something for client here?
 					break;
 					
-				case "server" :
+				case "server" : {
+					ConsoleIO.println("Login: " + session.getLogin());
 					if (packet.packet instanceof ServerPlayerListEntryPacket) {
 						ConsoleIO.println("SPSConnection::publish Changing channel to 'ingame' " + session.getClass().getSimpleName());
 						session.setChannel("ingame"); // look at changing channel implementation to packet specific channels instead of packet session specific channel 
-						session.subscribeSession("ingame");
+						subscribeToChannel("ingame", session.getUsername());
 						session.setLogin(true);
-					}				
+					}	
+				}
 					break;
 	
 				default:
@@ -349,5 +355,15 @@ public class SPSConnection implements ISPSConnection {
 	@Override
 	public void setType(String type) {
 		this.type = type;
+	}
+
+
+	@Override
+	public void checkLobbyConnection() {
+		if (numLogins == 0) {
+			ConsoleIO.println("Not connected to lobby");
+			subscribeToChannel("lobby", type);
+		}
+		numLogins++;
 	}
 }
