@@ -95,7 +95,7 @@ public class SPSConnection implements ISPSConnection {
 				ConsoleIO.println("type: " + type);
 				if (type == "server") {
 					socket.emit("type", true);
-					subscribeToChannel("lobby");
+					subscribeToChannel("lobby", type);
 				}
 			}
 		});
@@ -138,12 +138,12 @@ public class SPSConnection implements ISPSConnection {
 						ConsoleIO.println("Client login: " + sessions.get(username).getLogin());
 						if (packet.packet instanceof ServerJoinGamePacket) {
 							ConsoleIO.println("SPSConnection::publication Received ServerJoinGame packet. Subscribe to 'ingame'");
-							subscribeToChannel("ingame");
+							subscribeToChannel("ingame", username);
 							sessions.get(username).setChannel("ingame");
 						} else if (packet.packet instanceof ServerChatPacket) { 
 							// the last single "login" packet received by client before chunk data starts flowing in
 							ConsoleIO.println("SPSConnection::publication Received ServerChat packet. Unsubscribe from 'lobby' channel");
-							unsubscribeFromChannel("lobby");
+							unsubscribeFromChannel("lobby", username);
 							sessions.get(username).setLogin(true);
 						}
 					}
@@ -246,28 +246,28 @@ public class SPSConnection implements ISPSConnection {
 		} catch (Exception e) {
 			ConsoleIO.println("Packet session has not yet been initialised.");
 		} finally {			
-			//ConsoleIO.println("Connection <"+connectionID+"> sent packet <"+packet.packet.getClass().getSimpleName()+"> on channel <"+packet.channel+">");
-			socket.emit("publish", connectionID, packet.username, packet.x, packet.y, packet.radius, json, packet.channel);			
+			//ConsoleIO.println("Connection <"+connectionID+"> sent packet <"+packet.packet.getClass().getSimpleName()+"> on channel <"+packet.channel+"> to player " + packet.username);
+			socket.emit("publish", connectionID, packet.username, packet.x, packet.y, packet.radius, json, packet.channel, packet.packet.getClass().getSimpleName());			
 		}
 	}
 
 
 	@Override
-	public void subscribeToChannel(String channel) {
+	public void subscribeToChannel(String channel, String username) {
 		ConsoleIO.println("Subscribing to channel " + channel);
-		socket.emit("subscribe", channel);
+		socket.emit("subscribe", channel, username);
 	}
 
 	@Override
-	public void subscribeToArea(String channel, int x, int y, int AoI) {
+	public void subscribeToArea(String channel, String username, int x, int y, int AoI) {
 		ConsoleIO.println("SPSConnection::subscribetoArea => Subscribing to <" + x + "," + y + "> with an area of " + AoI + " on channel " + channel);
-		socket.emit("subscribe", channel, x, y, AoI);
+		socket.emit("subscribe", channel, username, x, y, AoI);
 	}
 
 	@Override
-	public void unsubscribeFromChannel(String channel) {
+	public void unsubscribeFromChannel(String channel, String username) {
 		ConsoleIO.println("SPSConnection::unsubscribeFromChannel => Unsubscribing from channel " + channel);
-		socket.emit("unsubscribe", channel);
+		socket.emit("unsubscribe", channel, username);
 	}
 
 

@@ -41,9 +41,9 @@ public interface ISPSConnection {
 
 	
 	// Sending functions
-	public void subscribeToChannel(String channel); // "subscribe"
-	public void subscribeToArea(String channel, int x, int y, int AoI); // "subscribe"
-	public void unsubscribeFromChannel(String channel); // "unsubscribe"
+	public void subscribeToChannel(String channel, String username); // "subscribe"
+	public void subscribeToArea(String channel, String username, int x, int y, int AoI); // "subscribe"
+	public void unsubscribeFromChannel(String channel, String username); // "unsubscribe"
 	public void unsubscribeFromArea(String channel);
 	public void publish(SPSPacket packet);
 	

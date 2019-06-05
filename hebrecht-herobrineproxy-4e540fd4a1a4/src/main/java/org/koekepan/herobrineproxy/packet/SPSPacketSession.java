@@ -58,7 +58,7 @@ public class SPSPacketSession implements IPacketSession {
 	@Override
 	public void subscribeSession(String channel) {
 		ConsoleIO.println("Session to subscribe to : "+session.getClass().getSimpleName());
-		session.subscribeToChannel(channel);	
+		session.subscribeToChannel(channel, username);	
 	}
 	
 	private void sendSession () {
@@ -68,7 +68,7 @@ public class SPSPacketSession implements IPacketSession {
 
 	@Override
 	public void unsubscribeSession(String channel) {
-		session.unsubscribeFromChannel(channel);		
+		session.unsubscribeFromChannel(channel, username);		
 	}
 
 

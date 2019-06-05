@@ -111,9 +111,9 @@ io.on('connection', function(socket) {
     });
 
     // publish message to subscribers
-    socket.on('publish', function(connectionID, player, x, y, radius, payload, channel)
+    socket.on('publish', function(connectionID, player, x, y, radius, payload, channel, packetName)
     {
-        //console.log("Sending packet from "+connectionID+" to channel "+channel);
+    //console.log("Attempting to send packet " + packetName + " from "+connectionID+" to channel " + channel + " for player " + player);
 
         if (!subscriberList.hasOwnProperty(channel)) {
             console.log("Trying to publish to a channel that does not exist: " + channel);
@@ -128,8 +128,9 @@ io.on('connection', function(socket) {
             if (sub.connectionID == connectionID)
                 continue;
 
-            if (_contains(sub, x, y, radius)) {
+            if (_contains(sub, x, y, radius) && (player == sub.name) || (sub.name == "server")) {
                 //console.log("Publishing to " + sub.connectionID);
+                //console.log("Confirming sending packet " + packetName + " from "+connectionID+" to channel " + channel + " for player " + player);
                 socket.broadcast.to(connectionInfoList[sub.connectionID].socket.id).emit('publication', connectionID, player, x, y, radius, payload, channel);
             }
         }
@@ -138,7 +139,7 @@ io.on('connection', function(socket) {
         return false;
     });
 
-    socket.on('subscribe', function(channel, x, y, AoI) {
+    socket.on('subscribe', function(channel, name, x, y, AoI) {
         var connectionID = socketToConnectionIDMap[socket.id];
         console.log("Received subscription request from " + connectionID + " for channel " + channel);
 
@@ -159,10 +160,10 @@ io.on('connection', function(socket) {
         // be undefined when it is a publication that is not spatially important
         if (x == undefined) {
             //console.log("Subscribing to <" + connection.x + "," + connection.y + "> with an AoI of " + connection.AoIRadius + ". SubID: "+subID);
-            var pack = new VAST.sub(connectionID, subID, connection.x, connection.y, connection.AoIRadius, channel);
+            var pack = new VAST.sub(connectionID, subID, connection.x, connection.y, connection.AoIRadius, channel, name);
         } else {
             //console.log("Subscribing to <" + x + "," + y + "> with an AoI of " + AoI + ". SubID: "+subID)
-            var pack = new VAST.sub(connectionID, subID, x, y, AoI, channel);
+            var pack = new VAST.sub(connectionID, subID, x, y, AoI, channel, name);
         }
 
         // create subscription channel if it doesn't exist
@@ -183,7 +184,7 @@ io.on('connection', function(socket) {
         //console.log(subscriberList);
     });
 
-    socket.on("unsubscribe", function (channel, x, y, AoI) {
+    socket.on("unsubscribe", function (channel, player, x, y, AoI) {
         // TODO: unsubscribe from channel and remove subIDs from channel list
         var connectionID = socketToConnectionIDMap[socket.id];
         console.log("Received unsubscribe request from " + connectionID + " for channel " + channel);
@@ -204,7 +205,7 @@ io.on('connection', function(socket) {
         for (var subID in connection.subscriptions[channel]) {
             var sub = connection.subscriptions[channel][subID];
 
-            if (sub.evaluate(x,y,AoI) == subType.DUPLICATE) {
+            if ((sub.evaluate(x,y,AoI) == subType.DUPLICATE) && (sub.name == player || sub.name == "server")) {
                 console.log("Unsubscribe subID " + subID + " from channel " + channel);
                 delete connection.subscriptions[channel][subID];
                 delete subscriberList[channel][subID];
