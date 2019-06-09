@@ -13,7 +13,7 @@ import org.koekepan.herobrineproxy.packet.PacketHandler;
 import org.koekepan.herobrineproxy.packet.PacketSession;
 import org.koekepan.herobrineproxy.packet.behaviours.DefaultPacketBehaviours;
 
-
+import com.github.steveice10.mc.protocol.packet.ingame.client.player.ClientPlayerPositionRotationPacket;
 import com.github.steveice10.packetlib.Session;
 import com.github.steveice10.packetlib.packet.Packet;
 
@@ -103,5 +103,12 @@ public class ClientSession implements IClientSession {
 	public void packetReceived(Packet packet) {
 		//ConsoleIO.println("ClientSession::packet received <"+packet.getClass().getSimpleName()+">");
 		packetHandler.packetReceived(packet);		
+	}
+
+
+	@Override
+	public void setPosition(ClientPlayerPositionRotationPacket responsePacket) {
+		// TODO Auto-generated method stub
+		
 	}
 }

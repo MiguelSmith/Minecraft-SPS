@@ -2,6 +2,7 @@ package org.koekepan.herobrineproxy.session;
 
 import org.koekepan.herobrineproxy.behaviour.BehaviourHandler;
 
+import com.github.steveice10.mc.protocol.packet.ingame.client.player.ClientPlayerPositionRotationPacket;
 import com.github.steveice10.packetlib.packet.Packet;
 
 public interface ISession {
@@ -16,4 +17,5 @@ public interface ISession {
 	public void sendPacket(Packet packet);
 	public void packetReceived(Packet packet);
 	public void setPacketBehaviours(BehaviourHandler<Packet> behaviours);
+	void setPosition(ClientPlayerPositionRotationPacket responsePacket);
 }

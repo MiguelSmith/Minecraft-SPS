@@ -4,12 +4,18 @@ import org.koekepan.herobrineproxy.ConsoleIO;
 import org.koekepan.herobrineproxy.sps.ISPSConnection;
 import org.koekepan.herobrineproxy.sps.SPSPacket;
 
+import com.github.steveice10.mc.protocol.packet.ingame.client.player.ClientPlayerPositionRotationPacket;
 import com.github.steveice10.packetlib.packet.Packet;
 
 public class SPSPacketSession implements IPacketSession {
 	
 	private String username;
 	private String channel;
+	
+	private int x;
+	private int y;
+	private int z;
+	private int radius;
 	
 	private boolean login;
 	
@@ -24,11 +30,13 @@ public class SPSPacketSession implements IPacketSession {
 		this.session = client;
 		this.username = username;
 		this.channel = channel;
+		
+		this.radius = 80;
 	}
 	
 	@Override
 	public void send(Packet packet) {
-		SPSPacket spsPacket = new SPSPacket(packet, username, channel);
+		SPSPacket spsPacket = new SPSPacket(packet, username, x, z, radius, channel);
 		session.publish(spsPacket);
 	}
 	
@@ -78,6 +86,16 @@ public class SPSPacketSession implements IPacketSession {
 	@Override
 	public boolean getLogin() {
 		return this.login;
+	}
+
+
+	public void setPosition(ClientPlayerPositionRotationPacket responsePacket) {
+		this.x = (int) responsePacket.getX();
+		// currently only use two dimensions
+		// this.y = (int) responsePacket.getY();
+		this.z = (int) responsePacket.getZ();
+		SPSPacket packet = new SPSPacket(responsePacket, username, x, z, radius, channel);
+		session.move(packet);
 	}
 
 }

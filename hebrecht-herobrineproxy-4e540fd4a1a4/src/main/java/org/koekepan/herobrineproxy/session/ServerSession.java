@@ -21,6 +21,7 @@ import org.koekepan.herobrineproxy.packet.behaviours.DefaultPacketBehaviours;
 import com.github.steveice10.mc.protocol.MinecraftProtocol;
 import com.github.steveice10.mc.protocol.data.SubProtocol;
 import com.github.steveice10.mc.protocol.packet.ingame.client.ClientPluginMessagePacket;
+import com.github.steveice10.mc.protocol.packet.ingame.client.player.ClientPlayerPositionRotationPacket;
 import com.github.steveice10.packetlib.Client;
 import com.github.steveice10.packetlib.Session;
 import com.github.steveice10.packetlib.packet.Packet;
@@ -335,5 +336,12 @@ public class ServerSession implements IServerSession {
 	
 	private void setMigrating(boolean migrating) {
 		this.migrate = migrating;
+	}
+
+
+	@Override
+	public void setPosition(ClientPlayerPositionRotationPacket responsePacket) {
+		// TODO Auto-generated method stub
+		
 	}
 }

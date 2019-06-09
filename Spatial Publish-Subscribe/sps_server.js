@@ -86,7 +86,7 @@ io.on('connection', function(socket) {
             socket: socket,                                     // socket
             x: 0,                                               // x coordinate of client
             y: 0,                                               // y coordinate of client
-            AoIRadius: 10                                       // radius of AoI (currently make it large enough that they will always send to each other)
+            AoIRadius: 16                                       // radius of AoI (currently make it large enough that they will always send to each other)
         };
 
     // handle type callback
@@ -290,24 +290,11 @@ io.on('connection', function(socket) {
     });
     */
     //move
-    socket.on('move', function(msg)
+    socket.on('move', function(connectionID, name, x, y, radius, payload, channel, packetName)
     {
-        //handle input message
-        var temp = msg.split(';');
-        var id = temp[0];
-        var x = temp[1];
-        var y = temp[2];
-        var AoIRadius = temp[3];
-        var connectionInfo = connectionInfoList[id];
-        //var ref = parseInt(temp[0]);
-        console.log('Client '+id+ ' changed their (x,y) position to <'+x+','+y+'> with an AoI radius of '+AoIRadius);
+        var connection = connectionInfoList[connectionID];
 
-        var pack = new VAST.sub(id, connectionInfo.x, connectionInfo.y, connectionInfo.AoIRadius);
-
-        //insert x, y and Aoi into 2D array
-        connectionInfo.x = x;
-        connectionInfo.y = y;
-        connectionInfo.AoIRadius = AoIRadius;
+        // handle movement (come up with username thing)
 
         return false;
     });

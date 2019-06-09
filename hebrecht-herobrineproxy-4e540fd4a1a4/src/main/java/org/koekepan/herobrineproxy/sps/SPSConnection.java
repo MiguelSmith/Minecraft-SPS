@@ -256,6 +256,14 @@ public class SPSConnection implements ISPSConnection {
 			socket.emit("publish", connectionID, packet.username, packet.x, packet.y, packet.radius, json, packet.channel, packet.packet.getClass().getSimpleName());			
 		}
 	}
+	
+	public void move(SPSPacket packet) {
+		//convert to JSON
+		Gson gson = new Gson();
+		byte[] payload = this.packetToBytes(packet.packet);
+		String json = gson.toJson(payload);
+		socket.emit("move", connectionID, packet.username, packet.x, packet.y, packet.radius, json, packet.channel, packet.packet.getClass().getSimpleName());
+	}
 
 
 	@Override

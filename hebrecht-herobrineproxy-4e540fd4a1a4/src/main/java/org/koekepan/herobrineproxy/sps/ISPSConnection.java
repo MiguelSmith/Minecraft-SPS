@@ -53,4 +53,5 @@ public interface ISPSConnection {
 	public void receivePacketSession(IPacketSession session, String username);
 	public void setType(String type);
 	public void checkLobbyConnection();
+	public void move(SPSPacket packet);
 }

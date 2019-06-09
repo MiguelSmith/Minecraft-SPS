@@ -1,9 +1,12 @@
 package org.koekepan.herobrineproxy.session;
 
+import com.github.steveice10.mc.protocol.packet.ingame.client.player.ClientPlayerPositionRotationPacket;
+
 public interface IServerSession extends ISession {
 	public void connect();	
 	public void setJoined(boolean joined);
 	void registerClientForChannels();
+	public void setPosition(ClientPlayerPositionRotationPacket responsePacket);
 	
 //	public boolean isMigrating();
 //	public void setMigrating(boolean migrating);

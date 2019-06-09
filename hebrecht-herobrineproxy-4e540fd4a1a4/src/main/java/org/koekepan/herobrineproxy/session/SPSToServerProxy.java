@@ -6,6 +6,7 @@ import org.koekepan.herobrineproxy.packet.behaviours.ClientSessionPacketBehaviou
 import org.koekepan.herobrineproxy.packet.behaviours.ServerSessionPacketBehaviours;
 import org.koekepan.herobrineproxy.sps.ISPSConnection;
 
+import com.github.steveice10.mc.protocol.packet.ingame.client.player.ClientPlayerPositionRotationPacket;
 import com.github.steveice10.packetlib.packet.Packet;
 
 public class SPSToServerProxy implements IProxySessionNew {
@@ -148,5 +149,12 @@ public class SPSToServerProxy implements IProxySessionNew {
 	@Override 
 	public void registerForPluginChannels() {
 		this.serverSession.registerClientForChannels();
+	}
+
+
+	@Override
+	public void setPosition(ClientPlayerPositionRotationPacket responsePacket) {
+		// TODO Auto-generated method stub
+		
 	}
 }
