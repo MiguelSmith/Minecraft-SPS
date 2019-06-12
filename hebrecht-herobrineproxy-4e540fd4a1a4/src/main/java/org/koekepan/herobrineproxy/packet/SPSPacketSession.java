@@ -90,9 +90,10 @@ public class SPSPacketSession implements IPacketSession {
 
 
 	public void setPosition(ClientPlayerPositionRotationPacket responsePacket) {
+		ConsoleIO.println("SPSPacketSession::SetPosition -> Setting position to <" + responsePacket.getX() + "," + responsePacket.getY() + ">");
 		this.x = (int) responsePacket.getX();
 		// currently only use two dimensions
-		// this.y = (int) responsePacket.getY();
+		this.y = (int) responsePacket.getY();
 		this.z = (int) responsePacket.getZ();
 		SPSPacket packet = new SPSPacket(responsePacket, username, x, z, radius, channel);
 		session.move(packet);

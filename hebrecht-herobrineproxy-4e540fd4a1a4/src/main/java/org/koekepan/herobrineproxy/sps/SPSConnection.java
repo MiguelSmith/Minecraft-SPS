@@ -251,13 +251,15 @@ public class SPSConnection implements ISPSConnection {
 			}
 		} catch (Exception e) {
 			ConsoleIO.println("Packet session has not yet been initialised.");
-		} finally {			
-			//ConsoleIO.println("Connection <"+connectionID+"> sent packet <"+packet.packet.getClass().getSimpleName()+"> on channel <"+packet.channel+"> to player " + packet.username);
+		} finally {
+			if (type == "client")
+				ConsoleIO.println("Connection <"+connectionID+"> sent packet <"+packet.packet.getClass().getSimpleName()+"> on channel <"+packet.channel+"> to player " + packet.username);
 			socket.emit("publish", connectionID, packet.username, packet.x, packet.y, packet.radius, json, packet.channel, packet.packet.getClass().getSimpleName());			
 		}
 	}
 	
 	public void move(SPSPacket packet) {
+		ConsoleIO.println("SPSConnection::move -> Moving to <" + packet.x + "," + packet.y + ">");
 		//convert to JSON
 		Gson gson = new Gson();
 		byte[] payload = this.packetToBytes(packet.packet);

@@ -154,7 +154,7 @@ public class SPSToServerProxy implements IProxySessionNew {
 
 	@Override
 	public void setPosition(ClientPlayerPositionRotationPacket responsePacket) {
-		// TODO Auto-generated method stub
-		
+		ConsoleIO.println("ClientToSPSProxy::SetPosition -> Setting position to <" + responsePacket.getX() + "," + responsePacket.getY() + ">");
+		clientSession.setPosition(responsePacket);		
 	}
 }

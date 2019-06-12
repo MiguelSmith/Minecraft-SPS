@@ -46,6 +46,11 @@ var packStrings = [];
 //          }
 var subscriberList = {};
 
+// map of base subscriptions
+// key -> username
+// value -> subID
+var usernames = {};
+
 //temporary socket -> ID map
 var socketToConnectionIDMap = {};
 var connectionInfoList = {};
@@ -109,85 +114,15 @@ io.on('connection', function(socket) {
     // publish message to subscribers
     socket.on('publish', function(connectionID, player, x, y, radius, payload, channel, packetName)
     {
+        //console.log("Attempting to send packet " + packetName + " from "+connectionID+" to channel " + channel + " for player " + player);
 
-    //console.log("Attempting to send packet " + packetName + " from "+connectionID+" to channel " + channel + " for player " + player);
-
-        if (!subscriberList.hasOwnProperty(channel)) {
-            console.log("Trying to publish to a channel that does not exist: " + channel);
-            return false;
-        }
-
-        for (var keys in subscriberList[channel]) {
-            var sub = subscriberList[channel][keys];
-
-            //console.log("Key: " + keys)
-            //console.log(sub);
-
-            if (sub.connectionID == connectionID)
-                continue;
-
-            if (_contains(sub, x, y, radius)) {
-                // if the lobby channel is getting the message, make sure to use the given username.
-                // else use the subscription username
-                // only necessary for aggregation of packets so we won't implement it here.
-                // player = channel == "lobby" ? player : sub.name;
-                // console.log("Publishing to " + sub.connectionID);
-
-                //console.log("Confirming sending packet " + packetName + " from "+connectionID+" to channel " + channel + " for player " + player);
-
-                socket.broadcast.to(connectionInfoList[sub.connectionID].socket.id).emit('publication', connectionID, player, x, y, radius, payload, channel);
-            }
-        }
-
+        _publish(socket, connectionID, player, x, y, radius, payload, channel, packetName);
 
         return true;;
     });
 
     socket.on('subscribe', function(channel, name, x, y, AoI) {
-        var connectionID = socketToConnectionIDMap[socket.id];
-        console.log("Received subscription request from " + connectionID + " for channel " + channel + " for " + name);
-
-        var connection = connectionInfoList[connectionID];
-
-        // TODO: create duplicate, update and new packet checker
-
-        // create subID for a channel if it doesn't exist
-        if (!channelSubID.hasOwnProperty(channel)) {
-            //console.log("Creating entry for channel " + channel);
-            channelSubID[channel] = -1;
-        }
-        channelSubID[channel]++;
-        var subID = channelSubID[channel];
-
-        // check whether it is a point or area publication
-        // NOTE: since this is a rough implementation, this crude method is used since x will always
-        // be undefined when it is a publication that is not spatially important
-        if (x == undefined) {
-            //console.log("Subscribing to <" + connection.x + "," + connection.y + "> with an AoI of " + connection.AoIRadius + ". SubID: "+subID);
-            var pack = new VAST.sub(connectionID, subID, connection.x, connection.y, connection.AoIRadius, channel, name);
-        } else {
-            //console.log("Subscribing to <" + x + "," + y + "> with an AoI of " + AoI + ". SubID: "+subID)
-            var pack = new VAST.sub(connectionID, subID, x, y, AoI, channel, name);
-        }
-
-        /*
-        // create subscription channel if it doesn't exist
-        if (!connection.subscriptions.hasOwnProperty(channel)) {
-            //console.log("Creating channel subscription for " + connection.id + " for channel " + channel);
-            connection.subscriptions[channel] = {};
-        }
-        connection.subscriptions[channel][subID] = pack;
-
-        connectionInfoList[connectionID] = connection;
-        */
-
-        // if this is the first subscription to the channel, create key
-        if (!subscriberList.hasOwnProperty(channel)) {
-            subscriberList[channel] = {};
-        }
-
-        subscriberList[channel][subID] = pack;
-        //console.log(subscriberList);
+        _subscribe(socket,channel,name,x,y,AoI);
 
         return true;
     });
@@ -294,7 +229,20 @@ io.on('connection', function(socket) {
     {
         var connection = connectionInfoList[connectionID];
 
-        // handle movement (come up with username thing)
+        if (usernames.hasOwnProperty(name)) {
+            var sub = subscriberList["ingame"][usernames[name]];
+
+            console.log("Updating sub from <" + sub.x + "," + sub.y + "> to <" + x + "," + y + ">")
+            sub.x = x;
+            sub.y = y;
+            sub.AoI = radius;
+            subscriberList["ingame"][usernames[name]] = sub;
+
+            _publish(socket, connectionID, name, x, y, radius, payload, channel, packetName);
+        } else {
+            console.log("Base subscription does not exist. Create one.")
+            _subscribe(socket, channel, name, x, y, radius);
+        }
 
         return false;
     });
@@ -312,6 +260,80 @@ var _contains = function (sub, pubX, pubY, pubAoI) {
     }
 
     return false;
+}
+
+var _subscribe = function (socket, channel, name, x, y, AoI) {
+    var connectionID = socketToConnectionIDMap[socket.id];
+    console.log("Received subscription request from " + connectionID + " for channel " + channel + " for " + name);
+
+    var connection = connectionInfoList[connectionID];
+
+    // TODO: create duplicate, update and new packet checker
+
+    // create subID for a channel if it doesn't exist
+    if (!channelSubID.hasOwnProperty(channel)) {
+        //console.log("Creating entry for channel " + channel);
+        channelSubID[channel] = -1;
+    }
+    channelSubID[channel]++;
+    var subID = channelSubID[channel];
+
+    if (channel == "ingame" && !usernames.hasOwnProperty(name)) {
+        usernames[name] = subID;
+    }
+
+    // check whether it is a point or area publication
+    // NOTE: since this is a rough implementation, this crude method is used since x will always
+    // be undefined when it is a publication that is not spatially important
+    if (x == undefined) {
+        //console.log("Subscribing to <" + connection.x + "," + connection.y + "> with an AoI of " + connection.AoIRadius + ". SubID: "+subID);
+        var pack = new VAST.sub(connectionID, subID, connection.x, connection.y, connection.AoIRadius, channel, name);
+    } else {
+        //console.log("Subscribing to <" + x + "," + y + "> with an AoI of " + AoI + ". SubID: "+subID)
+        var pack = new VAST.sub(connectionID, subID, x, y, AoI, channel, name);
+    }
+
+    if (connectionID == 0) {
+        console.log("Changing AoI to 10000");
+        pack.AoI = 10000;
+    }
+
+    // if this is the first subscription to the channel, create key
+    if (!subscriberList.hasOwnProperty(channel)) {
+        subscriberList[channel] = {};
+    }
+
+    subscriberList[channel][subID] = pack;
+    //console.log(subscriberList);
+}
+
+var _publish = function(socket, connectionID, player, x, y, radius, payload, channel, packetName) {
+    if (!subscriberList.hasOwnProperty(channel)) {
+        console.log("Trying to publish to a channel that does not exist: " + channel);
+        return false;
+    }
+
+    for (var keys in subscriberList[channel]) {
+        var sub = subscriberList[channel][keys];
+
+        //console.log("Key: " + keys)
+        //console.log(sub);
+
+        if (sub.connectionID == connectionID)
+            continue;
+
+        if (_contains(sub, x, y, radius)) {
+            // if the lobby channel is getting the message, make sure to use the given username.
+            // else use the subscription username
+            // only necessary for aggregation of packets so we won't implement it here.
+            // player = channel == "lobby" ? player : sub.name;
+            // console.log("Publishing to " + sub.connectionID);
+
+            //console.log("Confirming sending packet " + packetName + " from "+connectionID+" to channel " + channel + " for player " + player);
+
+            socket.broadcast.to(connectionInfoList[sub.connectionID].socket.id).emit('publication', connectionID, player, x, y, radius, payload, channel);
+        }
+    }
 }
 
 //set the server to listening

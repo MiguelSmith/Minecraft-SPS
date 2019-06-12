@@ -189,6 +189,7 @@ public class SPSSession implements IServerSession {
 
 	@Override
 	public void setPosition(ClientPlayerPositionRotationPacket responsePacket) {
+		ConsoleIO.println("SPSSession::SetPosition -> Setting position to <" + responsePacket.getX() + "," + responsePacket.getY() + ">");
 		packetSession.setPosition(responsePacket);
 	}
 	

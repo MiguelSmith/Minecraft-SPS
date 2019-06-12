@@ -159,6 +159,7 @@ public class ClientToSPSProxy implements IProxySessionNew {
 
 	@Override
 	public void setPosition(ClientPlayerPositionRotationPacket responsePacket) {
+		ConsoleIO.println("ClientToSPSProxy::SetPosition -> Setting position to <" + responsePacket.getX() + "," + responsePacket.getY() + ">");
 		serverSession.setPosition(responsePacket);
 	}
 }
