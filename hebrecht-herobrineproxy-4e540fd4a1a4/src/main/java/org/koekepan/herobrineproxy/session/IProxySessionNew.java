@@ -1,6 +1,6 @@
 package org.koekepan.herobrineproxy.session;
 
-import com.github.steveice10.mc.protocol.packet.ingame.client.player.ClientPlayerPositionRotationPacket;
+import com.github.steveice10.mc.protocol.packet.ingame.server.entity.player.ServerPlayerPositionRotationPacket;
 import com.github.steveice10.packetlib.packet.Packet;
 
 public interface IProxySessionNew {
@@ -25,5 +25,5 @@ public interface IProxySessionNew {
 	public void switchServer();
 	void setPacketForwardingBehaviour();
 	void registerForPluginChannels();
-	public void setPosition(ClientPlayerPositionRotationPacket responsePacket);
+	public void setPosition(Packet packet);
 }

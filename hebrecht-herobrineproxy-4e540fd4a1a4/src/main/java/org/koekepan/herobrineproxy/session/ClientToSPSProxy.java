@@ -8,6 +8,7 @@ import org.koekepan.herobrineproxy.sps.ISPSConnection;
 import org.koekepan.herobrineproxy.sps.SPSPacket;
 
 import com.github.steveice10.mc.protocol.packet.ingame.client.player.ClientPlayerPositionRotationPacket;
+import com.github.steveice10.mc.protocol.packet.ingame.server.entity.player.ServerPlayerPositionRotationPacket;
 import com.github.steveice10.packetlib.packet.Packet;
 
 public class ClientToSPSProxy implements IProxySessionNew {
@@ -158,8 +159,7 @@ public class ClientToSPSProxy implements IProxySessionNew {
 
 
 	@Override
-	public void setPosition(ClientPlayerPositionRotationPacket responsePacket) {
-		ConsoleIO.println("ClientToSPSProxy::SetPosition -> Setting position to <" + responsePacket.getX() + "," + responsePacket.getY() + ">");
+	public void setPosition(Packet responsePacket) {
 		serverSession.setPosition(responsePacket);
 	}
 }

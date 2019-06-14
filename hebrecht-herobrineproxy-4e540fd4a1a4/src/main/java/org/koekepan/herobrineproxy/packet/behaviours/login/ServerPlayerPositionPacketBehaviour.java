@@ -18,7 +18,7 @@ public class ServerPlayerPositionPacketBehaviour implements Behaviour<Packet> {
 	
 	
 	public ServerPlayerPositionPacketBehaviour(IProxySessionNew proxySession) {
-		ConsoleIO.println("ServerPlayerPositionPacketBehaviour -> setting proxy session to " + proxySession.getClass().getSimpleName());
+		//ConsoleIO.println("ServerPlayerPositionPacketBehaviour -> setting proxy session to " + proxySession.getClass().getSimpleName());
 		this.proxySession = proxySession;
 	}
 
@@ -26,9 +26,10 @@ public class ServerPlayerPositionPacketBehaviour implements Behaviour<Packet> {
 	@Override
 	public void process(Packet packet) {
 		ServerPlayerPositionRotationPacket p = (ServerPlayerPositionRotationPacket) packet;
-		ConsoleIO.println("ServerPlayerPositionRotationPacket::process => Player \""+proxySession.getUsername()+"\" received location: "+p.toString());		
+		//ConsoleIO.println("ServerPlayerPositionRotationPacket::process => Player \""+proxySession.getUsername()+"\" received location: "+p.toString());		
 		ClientPlayerPositionRotationPacket responsePacket = new ClientPlayerPositionRotationPacket(true, p.getX(), p.getY(), p.getZ(), p.getYaw(), p.getPitch());
-		proxySession.setPosition(responsePacket);
+		proxySession.sendPacketToServer(responsePacket);
+		//proxySession.setPosition(p);
 		proxySession.sendPacketToClient(packet);
 		proxySession.setPacketForwardingBehaviour();
 	}

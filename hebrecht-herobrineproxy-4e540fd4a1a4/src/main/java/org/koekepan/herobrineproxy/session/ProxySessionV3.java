@@ -6,6 +6,7 @@ import org.koekepan.herobrineproxy.packet.behaviours.ClientSessionPacketBehaviou
 import org.koekepan.herobrineproxy.packet.behaviours.ServerSessionPacketBehaviours;
 
 import com.github.steveice10.mc.protocol.packet.ingame.client.player.ClientPlayerPositionRotationPacket;
+import com.github.steveice10.mc.protocol.packet.ingame.server.entity.player.ServerPlayerPositionRotationPacket;
 import com.github.steveice10.packetlib.packet.Packet;
 
 public class ProxySessionV3 implements IProxySessionNew {
@@ -154,7 +155,7 @@ public class ProxySessionV3 implements IProxySessionNew {
 
 
 	@Override
-	public void setPosition(ClientPlayerPositionRotationPacket responsePacket) {
+	public void setPosition(Packet responsePacket) {
 		// TODO Auto-generated method stub
 		
 	}

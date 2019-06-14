@@ -91,7 +91,7 @@ io.on('connection', function(socket) {
             socket: socket,                                     // socket
             x: 0,                                               // x coordinate of client
             y: 0,                                               // y coordinate of client
-            AoIRadius: 16                                       // radius of AoI (currently make it large enough that they will always send to each other)
+            AoIRadius: 10                                       // radius of AoI (currently make it large enough that they will always send to each other)
         };
 
     // handle type callback
@@ -157,86 +157,21 @@ io.on('connection', function(socket) {
         return true;
     });
 
-    /*
-    //handle a subscribe or unsubscribe function
-    socket.on('function', function(msg)
-    {
-        console.log(msg);
-        var temp = msg.split(';');
-        var query = temp[1];
-        var id = temp[0];
-        var newSubscription = temp[2];
-        var AoIRadius = temp[3];
-        var x = temp[4];
-        var y = temp[5]
-        var channel = temp[6];
-
-
-        var refId = socketToConnectionIDMap[socket.id];
-        var connectionInfo = connectionInfoList[refId];
-
-        switch (query)
-        {
-            //subscribe
-            case 'sub':
-            {
-
-                if (newSubscription == "true") {
-                    subID++;
-                    var pack =  new VAST.sub(refId, subID, connectionInfo.x, connectionInfo.y, AoIRadius, channel);
-                    //var pack = new VAST.sub(ref,0,0,temp[3],temp[6]);
-                    connectionInfoList[refId].AoIRadius = AoIRadius;
-                    console.log('Client '+refId+ ' subscribed to the area around it on channel '+channel);
-                } else {
-                    var pack =  new VAST.sub(id, x, y, AoIRadius, channel);
-                    console.log('Client '+refId+ ' subscribed to the area '+AoIRadius+' units around <'+x+','+y+'> on channel '+channel);
-                }
-            }
-            break;
-
-            //unsubscribe
-            case 'unsub':
-            {
-                if (newSubscription == "true")
-                {
-                    connectionInfoList[refId].AoIRadius = AoIRadius;
-                    var hash = refId+'/'+connectionInfo.x+'/'+connectionInfo.y;
-                    console.log('Client '+id+' unsubscribed from the area around it on channel '+channel);
-                    var returnStr = ref+';'+hash+';'+connectionInfo.x+';'+connectionInfo.y+';'+channel;
-                } else
-                {
-                    var hash = refId+'/'+x+'/'+y;
-                    console.log('Client '+id+' unsubscribed from the area <'+x+','+y+'> on channel '+channel);
-                    var returnStr = refId+';'+hash+';'+x+';'+y+';'+channel;
-                }
-            }
-            break;
-
-            //unknown command
-            default:
-            {
-                console.log('Cannot understand function');
-                socket.emit('unknown', 'Unsupported function');
-            }
-            break;
-        }
-
-        return false;
-    });
-    */
     //move
     socket.on('move', function(connectionID, name, x, y, radius, payload, channel, packetName)
     {
+        //console.log("Moving client " + name + " for connectionID " + connectionID + " to <" + x + "," + y + "> on channel " + channel + " on packet " + packetName);
         var connection = connectionInfoList[connectionID];
 
         if (usernames.hasOwnProperty(name)) {
             var sub = subscriberList["ingame"][usernames[name]];
 
-            console.log("Updating sub from <" + sub.x + "," + sub.y + "> to <" + x + "," + y + ">")
+            //console.log("Updating sub from <" + sub.x + "," + sub.y + "> to <" + x + "," + y + ">")
             sub.x = x;
             sub.y = y;
             sub.AoI = radius;
             subscriberList["ingame"][usernames[name]] = sub;
+            //console.log(subscriberList);
 
             _publish(socket, connectionID, name, x, y, radius, payload, channel, packetName);
         } else {
@@ -254,6 +189,8 @@ var _contains = function (sub, pubX, pubY, pubAoI) {
     var dx = sub.x - pubX;
     var dy = sub.y - pubY;
     var dist = Math.sqrt(Math.pow(dx,2) + Math.pow(dy,2));
+
+    //console.log("pubAoI: " + pubAoI + " sub.AoI: " + sub.AoI + " Distance: " + dist);
 
     if (dist <= (pubAoI + sub.AoI)) {
         return true;
@@ -304,10 +241,12 @@ var _subscribe = function (socket, channel, name, x, y, AoI) {
     }
 
     subscriberList[channel][subID] = pack;
-    //console.log(subscriberList);
+    console.log(subscriberList);
 }
 
 var _publish = function(socket, connectionID, player, x, y, radius, payload, channel, packetName) {
+    //console.log("Attempting to send packet " + packetName + " from " + connectionID + " to channel " + channel + " for player " + player);
+
     if (!subscriberList.hasOwnProperty(channel)) {
         console.log("Trying to publish to a channel that does not exist: " + channel);
         return false;

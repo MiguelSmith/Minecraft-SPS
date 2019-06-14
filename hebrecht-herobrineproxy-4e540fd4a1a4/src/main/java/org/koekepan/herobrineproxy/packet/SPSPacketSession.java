@@ -4,7 +4,9 @@ import org.koekepan.herobrineproxy.ConsoleIO;
 import org.koekepan.herobrineproxy.sps.ISPSConnection;
 import org.koekepan.herobrineproxy.sps.SPSPacket;
 
+import com.github.steveice10.mc.protocol.packet.ingame.client.player.ClientPlayerPositionPacket;
 import com.github.steveice10.mc.protocol.packet.ingame.client.player.ClientPlayerPositionRotationPacket;
+import com.github.steveice10.mc.protocol.packet.ingame.server.entity.player.ServerPlayerPositionRotationPacket;
 import com.github.steveice10.packetlib.packet.Packet;
 
 public class SPSPacketSession implements IPacketSession {
@@ -23,6 +25,8 @@ public class SPSPacketSession implements IPacketSession {
 	
 	public SPSPacketSession(ISPSConnection session) {
 		this.session = session;
+		
+		this.radius = 10;
 	}
 		
 	
@@ -31,7 +35,7 @@ public class SPSPacketSession implements IPacketSession {
 		this.username = username;
 		this.channel = channel;
 		
-		this.radius = 80;
+		this.radius = 10;
 	}
 	
 	@Override
@@ -89,14 +93,27 @@ public class SPSPacketSession implements IPacketSession {
 	}
 
 
-	public void setPosition(ClientPlayerPositionRotationPacket responsePacket) {
-		ConsoleIO.println("SPSPacketSession::SetPosition -> Setting position to <" + responsePacket.getX() + "," + responsePacket.getY() + ">");
-		this.x = (int) responsePacket.getX();
-		// currently only use two dimensions
-		this.y = (int) responsePacket.getY();
-		this.z = (int) responsePacket.getZ();
-		SPSPacket packet = new SPSPacket(responsePacket, username, x, z, radius, channel);
-		session.move(packet);
+	public void setPosition(Packet responsePacket) {
+		// TODO make this less rough
+		try {
+			ClientPlayerPositionRotationPacket packet = (ClientPlayerPositionRotationPacket) responsePacket;
+			this.x = (int) packet.getX();
+			// currently only use two dimensions
+			this.y = (int) packet.getY();
+			this.z = (int) packet.getZ();
+			//ConsoleIO.println("SPSPacketSession::SetPosition -> Setting position to <" + packet.getX() + "," + packet.getY() + ">");
+			SPSPacket spsPacket = new SPSPacket(packet, username, x, z, radius, channel);
+			session.move(spsPacket);
+		} catch (Exception e) {
+			ClientPlayerPositionPacket packet = (ClientPlayerPositionPacket) responsePacket;
+			this.x = (int) packet.getX();
+			// currently only use two dimensions
+			this.y = (int) packet.getY();
+			this.z = (int) packet.getZ();
+			//ConsoleIO.println("SPSPacketSession::SetPosition -> Setting position to <" + packet.getX() + "," + packet.getY() + ">");
+			SPSPacket spsPacket = new SPSPacket(packet, username, x, z, radius, channel);
+			session.move(spsPacket);
+		}
 	}
 
 }

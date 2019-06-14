@@ -18,6 +18,7 @@ import org.koekepan.herobrineproxy.sps.ISPSConnection;
 
 import com.github.steveice10.mc.protocol.packet.ingame.client.ClientPluginMessagePacket;
 import com.github.steveice10.mc.protocol.packet.ingame.client.player.ClientPlayerPositionRotationPacket;
+import com.github.steveice10.mc.protocol.packet.ingame.server.entity.player.ServerPlayerPositionRotationPacket;
 import com.github.steveice10.mc.protocol.packet.login.client.LoginStartPacket;
 import com.github.steveice10.packetlib.packet.Packet;
 import com.google.common.base.Charsets;
@@ -186,11 +187,10 @@ public class SPSSession implements IServerSession {
 		return buff.array();
 	}
 
-
 	@Override
-	public void setPosition(ClientPlayerPositionRotationPacket responsePacket) {
-		ConsoleIO.println("SPSSession::SetPosition -> Setting position to <" + responsePacket.getX() + "," + responsePacket.getY() + ">");
+	public void setPosition(Packet responsePacket) {
 		packetSession.setPosition(responsePacket);
+		
 	}
 	
 	

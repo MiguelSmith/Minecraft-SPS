@@ -4,6 +4,8 @@ import org.koekepan.herobrineproxy.ConsoleIO;
 import org.koekepan.herobrineproxy.behaviour.BehaviourHandler;
 import org.koekepan.herobrineproxy.packet.behaviours.client.ClientHandshakePacketBehaviour;
 import org.koekepan.herobrineproxy.packet.behaviours.client.ClientLoginStartPacketBehaviour;
+import org.koekepan.herobrineproxy.packet.behaviours.client.ClientPlayerPositionPacketBehaviour;
+import org.koekepan.herobrineproxy.packet.behaviours.client.ClientPlayerPositionRotationPacketBehaviour;
 import org.koekepan.herobrineproxy.session.ISession;
 import org.koekepan.herobrineproxy.session.IProxySessionNew;
 
@@ -60,7 +62,9 @@ public class ClientSessionPacketBehaviours extends BehaviourHandler<Packet> {
 		//ConsoleIO.println("ClientSessionPacketBehaviours::registerForwardingBehaviours => Clearing behaviours before registering default behaviours");
 		clearBehaviours();
 		registerBehaviour(HandshakePacket.class, new ClientHandshakePacketBehaviour(this.clientSession, proxySession));										// 0x06 Player Position And Look 
-		registerBehaviour(LoginStartPacket.class, new ClientLoginStartPacketBehaviour(proxySession));												// 0x01 Login Start 
+		registerBehaviour(LoginStartPacket.class, new ClientLoginStartPacketBehaviour(proxySession));														// 0x01 Login Start 
+		registerBehaviour(ClientPlayerPositionRotationPacket.class, new ClientPlayerPositionRotationPacketBehaviour(proxySession));
+		registerBehaviour(ClientPlayerPositionPacket.class, new ClientPlayerPositionPacketBehaviour(proxySession));
 	}
 	
 	
@@ -79,8 +83,6 @@ public class ClientSessionPacketBehaviours extends BehaviourHandler<Packet> {
 		registerBehaviour(ClientPluginMessagePacket.class, serverForwarder);
 		registerBehaviour(ClientPlayerInteractEntityPacket.class, serverForwarder);
 		registerBehaviour(ClientKeepAlivePacket.class, serverForwarder);
-		registerBehaviour(ClientPlayerPositionPacket.class, serverForwarder);
-		registerBehaviour(ClientPlayerPositionRotationPacket.class, serverForwarder);
 		registerBehaviour(ClientPlayerRotationPacket.class, serverForwarder);
 		registerBehaviour(ClientPlayerMovementPacket.class, serverForwarder);
 		registerBehaviour(ClientVehicleMovePacket.class, serverForwarder);
