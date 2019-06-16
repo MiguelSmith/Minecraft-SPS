@@ -51,6 +51,11 @@ var subscriberList = {};
 // value -> subID
 var usernames = {};
 
+// map of base server subscriptions
+// key -> username
+// value -> subID
+var usernamesServer = {};
+
 //temporary socket -> ID map
 var socketToConnectionIDMap = {};
 var connectionInfoList = {};
@@ -163,20 +168,27 @@ io.on('connection', function(socket) {
         //console.log("Moving client " + name + " for connectionID " + connectionID + " to <" + x + "," + y + "> on channel " + channel + " on packet " + packetName);
         var connection = connectionInfoList[connectionID];
 
-        if (usernames.hasOwnProperty(name)) {
+        if (usernames.hasOwnProperty(name) && usernamesServer.hasOwnProperty(name)) {
             var sub = subscriberList["ingame"][usernames[name]];
+            var subServer = subscriberList["ingame"][usernamesServer[name]];
 
             //console.log("Updating sub from <" + sub.x + "," + sub.y + "> to <" + x + "," + y + ">")
             sub.x = x;
+            subServer.x = x;
             sub.y = y;
+            subServer.y = y;
             sub.AoI = radius;
+            subServer.AoI = radius;
             subscriberList["ingame"][usernames[name]] = sub;
+            subscriberList["ingame"][usernamesServer[name]] = subServer;
+
+
             //console.log(subscriberList);
 
             _publish(socket, connectionID, name, x, y, radius, payload, channel, packetName);
         } else {
             console.log("Base subscription does not exist. Create one.")
-            _subscribe(socket, channel, name, x, y, radius);
+            //_subscribe(socket, channel, name, x, y, radius);
         }
 
         return false;
@@ -190,9 +202,10 @@ var _contains = function (sub, pubX, pubY, pubAoI) {
     var dy = sub.y - pubY;
     var dist = Math.sqrt(Math.pow(dx,2) + Math.pow(dy,2));
 
-    //console.log("pubAoI: " + pubAoI + " sub.AoI: " + sub.AoI + " Distance: " + dist);
+    //console.log("pubAoI: " + pubAoI + " sub.AoI: " + sub.AoI + " Distance: " + dist + " subPos: <"+sub.x+","+sub.y+"> pubPos: <"+pubX+","+pubY+">");
 
     if (dist <= (pubAoI + sub.AoI)) {
+        //console.log("true");
         return true;
     }
 
@@ -215,8 +228,11 @@ var _subscribe = function (socket, channel, name, x, y, AoI) {
     channelSubID[channel]++;
     var subID = channelSubID[channel];
 
-    if (channel == "ingame" && !usernames.hasOwnProperty(name)) {
+    if (channel == "ingame" && !usernames.hasOwnProperty(name) && connectionID == 1) {
         usernames[name] = subID;
+    }
+    if (channel == "ingame" && !usernamesServer.hasOwnProperty(name) && connectionID == 0) {
+        usernamesServer[name] = subID;
     }
 
     // check whether it is a point or area publication
@@ -230,10 +246,12 @@ var _subscribe = function (socket, channel, name, x, y, AoI) {
         var pack = new VAST.sub(connectionID, subID, x, y, AoI, channel, name);
     }
 
+/*
     if (connectionID == 0) {
         console.log("Changing AoI to 10000");
         pack.AoI = 10000;
     }
+*/
 
     // if this is the first subscription to the channel, create key
     if (!subscriberList.hasOwnProperty(channel)) {
@@ -266,7 +284,7 @@ var _publish = function(socket, connectionID, player, x, y, radius, payload, cha
             // else use the subscription username
             // only necessary for aggregation of packets so we won't implement it here.
             // player = channel == "lobby" ? player : sub.name;
-            // console.log("Publishing to " + sub.connectionID);
+            //console.log("Publishing to " + sub.subID);
 
             //console.log("Confirming sending packet " + packetName + " from "+connectionID+" to channel " + channel + " for player " + player);
 

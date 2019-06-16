@@ -26,7 +26,7 @@ public class SPSPacketSession implements IPacketSession {
 	public SPSPacketSession(ISPSConnection session) {
 		this.session = session;
 		
-		this.radius = 10;
+		this.radius = 5;
 	}
 		
 	
@@ -35,7 +35,7 @@ public class SPSPacketSession implements IPacketSession {
 		this.username = username;
 		this.channel = channel;
 		
-		this.radius = 10;
+		this.radius = 5;
 	}
 	
 	@Override
