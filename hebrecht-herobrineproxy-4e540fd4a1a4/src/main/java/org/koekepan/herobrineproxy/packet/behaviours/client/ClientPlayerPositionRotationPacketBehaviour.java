@@ -9,6 +9,7 @@ public class ClientPlayerPositionRotationPacketBehaviour implements Behaviour<Pa
 	
 	private IProxySessionNew proxySession;
 	
+	@SuppressWarnings("unused")
 	public ClientPlayerPositionRotationPacketBehaviour() {}
 	
 	public ClientPlayerPositionRotationPacketBehaviour(IProxySessionNew proxySession) {

@@ -5,6 +5,7 @@ import org.koekepan.herobrineproxy.ConsoleIO;
 import org.koekepan.herobrineproxy.packet.behaviours.ClientSessionPacketBehaviours;
 import org.koekepan.herobrineproxy.packet.behaviours.ServerSessionPacketBehaviours;
 import org.koekepan.herobrineproxy.sps.ISPSConnection;
+import org.koekepan.herobrineproxy.sps.SPSEntityTracker;
 
 import com.github.steveice10.mc.protocol.packet.ingame.client.player.ClientPlayerPositionRotationPacket;
 import com.github.steveice10.mc.protocol.packet.ingame.server.entity.player.ServerPlayerPositionRotationPacket;
@@ -16,6 +17,8 @@ public class SPSToServerProxy implements IProxySessionNew {
 	IServerSession serverSession;
 	ISPSConnection spsConnection;
 	
+	SPSEntityTracker entityTracker;
+	
 	ClientSessionPacketBehaviours clientPacketBehaviours;
 	ServerSessionPacketBehaviours serverPacketBehaviours;
 		
@@ -23,6 +26,7 @@ public class SPSToServerProxy implements IProxySessionNew {
 		this.spsConnection = spsConnection;
 		this.clientSession = new SPSSession(spsConnection);
 		this.serverSession = new ServerSession(serverHost, serverPort);
+		this.entityTracker = new SPSEntityTracker(clientSession);
 		this.clientPacketBehaviours = new ClientSessionPacketBehaviours(this);
 		this.clientPacketBehaviours.registerDefaultBehaviours(clientSession);
 		this.clientSession.setPacketBehaviours(clientPacketBehaviours);		
@@ -82,6 +86,7 @@ public class SPSToServerProxy implements IProxySessionNew {
 		
 		this.serverPacketBehaviours = new ServerSessionPacketBehaviours(this, serverSession);
 		this.serverPacketBehaviours.registerForwardingBehaviour();
+		this.serverPacketBehaviours.registerSPSBehaviour(entityTracker);
 		this.serverSession.setPacketBehaviours(serverPacketBehaviours);	
 		serverSession.connect();
 	}

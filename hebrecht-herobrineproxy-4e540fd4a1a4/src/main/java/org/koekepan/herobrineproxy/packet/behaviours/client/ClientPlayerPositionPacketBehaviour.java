@@ -10,9 +10,7 @@ public class ClientPlayerPositionPacketBehaviour implements Behaviour<Packet> {
 	public IProxySessionNew proxySession;
 
 	@SuppressWarnings("unused")
-	private ClientPlayerPositionPacketBehaviour() {
-		// TODO Auto-generated constructor stub
-	}
+	private ClientPlayerPositionPacketBehaviour() {}
 	
 	public ClientPlayerPositionPacketBehaviour(IProxySessionNew proxySession) {
 		this.proxySession = proxySession;
