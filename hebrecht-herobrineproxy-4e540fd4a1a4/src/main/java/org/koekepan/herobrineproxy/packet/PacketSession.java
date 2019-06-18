@@ -56,4 +56,11 @@ public class PacketSession implements IPacketSession {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+
+	@Override
+	public void updatePosition(Packet movementPacket) {
+		// TODO Auto-generated method stub
+		
+	}
 }

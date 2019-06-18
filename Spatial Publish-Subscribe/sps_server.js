@@ -185,7 +185,8 @@ io.on('connection', function(socket) {
 
             //console.log(subscriberList);
 
-            _publish(socket, connectionID, name, x, y, radius, payload, channel, packetName);
+            // take this out so that the server can move as well without resending the packet
+            //_publish(socket, connectionID, name, x, y, radius, payload, channel, packetName);
         } else {
             console.log("Base subscription does not exist. Create one.")
             //_subscribe(socket, channel, name, x, y, radius);
@@ -228,10 +229,15 @@ var _subscribe = function (socket, channel, name, x, y, AoI) {
     channelSubID[channel]++;
     var subID = channelSubID[channel];
 
-    if (channel == "ingame" && !usernames.hasOwnProperty(name) && connectionID == 1) {
+    if (channel == "ingame" &&
+        !usernames.hasOwnProperty(name) &&
+        connectionID == 1) {
         usernames[name] = subID;
     }
-    if (channel == "ingame" && !usernamesServer.hasOwnProperty(name) && connectionID == 0) {
+
+    if (channel == "ingame" &&
+        !usernamesServer.hasOwnProperty(name) &&
+        connectionID == 0) {
         usernamesServer[name] = subID;
     }
 
@@ -263,7 +269,10 @@ var _subscribe = function (socket, channel, name, x, y, AoI) {
 }
 
 var _publish = function(socket, connectionID, player, x, y, radius, payload, channel, packetName) {
-    //console.log("Attempting to send packet " + packetName + " from " + connectionID + " to channel " + channel + " for player " + player);
+    //console.log("Attempting to send packet " + packetName + " from " + connectionID + " to channel " + channel + " for player " + player + " at <" + x + "," + y + "> for radius " + radius);
+
+    if (packetName == "ServerEntityPositionPacket")
+        console.log("Attempting to send packet " + packetName + " from " + connectionID + " to channel " + channel + " for player " + player + " at <" + x + "," + y + "> for radius " + radius);
 
     if (!subscriberList.hasOwnProperty(channel)) {
         console.log("Trying to publish to a channel that does not exist: " + channel);
@@ -286,7 +295,9 @@ var _publish = function(socket, connectionID, player, x, y, radius, payload, cha
             // player = channel == "lobby" ? player : sub.name;
             //console.log("Publishing to " + sub.subID);
 
-            //console.log("Confirming sending packet " + packetName + " from "+connectionID+" to channel " + channel + " for player " + player);
+            //console.log("Confirming sending packet " + packetName + " from "+connectionID+" to channel " + channel + " for player " + player + " at <" + x + "," + y + "> for radius " + radius);
+            if (packetName == "ServerEntityPositionPacket")
+                console.log("Confirming sending packet " + packetName + " from "+connectionID+" to channel " + channel + " for player " + player + " at <" + x + "," + y + "> for radius " + radius);
 
             socket.broadcast.to(connectionInfoList[sub.connectionID].socket.id).emit('publication', connectionID, player, x, y, radius, payload, channel);
         }

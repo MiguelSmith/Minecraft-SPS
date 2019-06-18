@@ -189,8 +189,12 @@ public class SPSSession implements IServerSession {
 
 	@Override
 	public void setPosition(Packet responsePacket) {
-		packetSession.setPosition(responsePacket);
+		packetSession.setPositionAndMove(responsePacket);
 		
+	}
+	
+	public void sendWithPosition(Packet packet, int x, int z, int radius) {
+		packetSession.sendWithPosition(packet,x,z,radius);
 	}
 	
 	

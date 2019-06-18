@@ -85,7 +85,6 @@ public class SPSToServerProxy implements IProxySessionNew {
 		this.spsConnection.addListener(this.serverSession);
 		
 		this.serverPacketBehaviours = new ServerSessionPacketBehaviours(this, serverSession);
-		this.serverPacketBehaviours.registerForwardingBehaviour();
 		this.serverPacketBehaviours.registerSPSBehaviour(entityTracker);
 		this.serverSession.setPacketBehaviours(serverPacketBehaviours);	
 		serverSession.connect();

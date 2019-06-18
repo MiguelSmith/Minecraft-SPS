@@ -20,6 +20,8 @@ import org.koekepan.herobrineproxy.session.ISession;
 
 import com.github.steveice10.mc.protocol.MinecraftProtocol;
 import com.github.steveice10.mc.protocol.data.SubProtocol;
+import com.github.steveice10.mc.protocol.packet.ingame.client.player.ClientPlayerPositionPacket;
+import com.github.steveice10.mc.protocol.packet.ingame.client.player.ClientPlayerPositionRotationPacket;
 import com.github.steveice10.mc.protocol.packet.ingame.server.ServerChatPacket;
 import com.github.steveice10.mc.protocol.packet.ingame.server.ServerJoinGamePacket;
 import com.github.steveice10.mc.protocol.packet.ingame.server.ServerPlayerListEntryPacket;
@@ -151,6 +153,8 @@ public class SPSConnection implements ISPSConnection {
 							}
 							sessions.get(username).setLogin(true);
 						}
+					} else if (packet.packet instanceof ClientPlayerPositionRotationPacket || packet.packet instanceof ClientPlayerPositionPacket) {
+						sessions.get(username).updatePosition(packet.packet);
 					}
 					
 					listeners.get(username).sendPacket(packet.packet);

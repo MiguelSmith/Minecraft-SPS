@@ -10,4 +10,5 @@ public interface IPacketSession {
 	public void unsubscribeSession(String channel);
 	public void setLogin(boolean login);
 	public boolean getLogin();
+	public void updatePosition(Packet movementPacket);
 }

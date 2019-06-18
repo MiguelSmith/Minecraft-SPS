@@ -1,41 +1,41 @@
 package org.koekepan.herobrineproxy.sps;
 
 public class SPSEntity {
-	private double x;
-	private double y;
-	private double z;
+	private int x;
+	private int y;
+	private int z;
 	private int entityID;
 	
 	public SPSEntity() {}
 	
-	public SPSEntity(int entityID, double x, double y, double z) {
+	public SPSEntity(int entityID, int x, int y, int z) {
 		this.entityID = entityID;
 		this.x = x;
 		this.y = y;
 		this.z = z;
 	}
 
-	public void setX(double x) {
+	public void setX(int x) {
 		this.x = x;
 	}
 
-	public void setY(double y) {
+	public void setY(int y) {
 		this.y = y;
 	}
 	
-	public void setZ(double z) {
+	public void setZ(int z) {
 		this.z = z;
 	}
 
-	public double getX() {
+	public int getX() {
 		return this.x;
 	}
 
-	public double getY() {
+	public int getY() {
 		return this.y;
 	}
 	
-	public double getZ() {
+	public int getZ() {
 		return this.z;
 	}
 }

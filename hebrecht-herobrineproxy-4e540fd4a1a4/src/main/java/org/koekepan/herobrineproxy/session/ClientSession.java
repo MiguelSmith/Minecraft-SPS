@@ -112,4 +112,11 @@ public class ClientSession implements IClientSession {
 		// TODO Auto-generated method stub
 		
 	}
+
+
+	@Override
+	public void sendWithPosition(Packet packet, int x, int z, int radius) {
+		// TODO Auto-generated method stub
+		
+	}
 }

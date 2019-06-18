@@ -345,4 +345,11 @@ public class ServerSession implements IServerSession {
 		// TODO Auto-generated method stub
 		
 	}
+
+
+	@Override
+	public void sendWithPosition(Packet packet, int x, int z, int radius) {
+		// TODO Auto-generated method stub
+		
+	}
 }

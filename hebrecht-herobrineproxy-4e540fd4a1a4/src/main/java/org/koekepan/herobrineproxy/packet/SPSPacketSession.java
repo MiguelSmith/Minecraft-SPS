@@ -91,29 +91,42 @@ public class SPSPacketSession implements IPacketSession {
 	public boolean getLogin() {
 		return this.login;
 	}
-
-
-	public void setPosition(Packet responsePacket) {
+	
+	public void updatePosition(Packet movementPacket) {
 		// TODO make this less rough
 		try {
-			ClientPlayerPositionRotationPacket packet = (ClientPlayerPositionRotationPacket) responsePacket;
-			this.x = (int) packet.getX();
+			ClientPlayerPositionRotationPacket packet = (ClientPlayerPositionRotationPacket) movementPacket;
+			x = (int) packet.getX();
 			// currently only use two dimensions
-			this.y = (int) packet.getY();
-			this.z = (int) packet.getZ();
+			y = (int) packet.getY();
+			z = (int) packet.getZ();
 			//ConsoleIO.println("SPSPacketSession::SetPosition -> Setting position to <" + packet.getX() + "," + packet.getY() + ">");
-			SPSPacket spsPacket = new SPSPacket(packet, username, x, z, radius, channel);
-			session.move(spsPacket);
 		} catch (Exception e) {
-			ClientPlayerPositionPacket packet = (ClientPlayerPositionPacket) responsePacket;
-			this.x = (int) packet.getX();
+			ClientPlayerPositionPacket packet = (ClientPlayerPositionPacket) movementPacket;
+			x = (int) packet.getX();
 			// currently only use two dimensions
-			this.y = (int) packet.getY();
-			this.z = (int) packet.getZ();
+			y = (int) packet.getY();
+			z = (int) packet.getZ();
 			//ConsoleIO.println("SPSPacketSession::SetPosition -> Setting position to <" + packet.getX() + "," + packet.getY() + ">");
-			SPSPacket spsPacket = new SPSPacket(packet, username, x, z, radius, channel);
-			session.move(spsPacket);
 		}
+	}
+
+	public void setPositionAndMove(Packet responsePacket) {
+		updatePosition(responsePacket);		
+		sendMove(x, y, z, radius, channel, responsePacket);
+	}
+	
+	private void sendMove(int x, int y, int z, int radius, String channel, Packet packet) {
+		SPSPacket spsPacket = new SPSPacket(packet, this.username, x, z, radius, channel);
+		session.move(spsPacket);
+		session.publish(spsPacket);
+	}
+
+
+	public void sendWithPosition(Packet packet, int x, int z, int radius) {
+		SPSPacket spsPacket = new SPSPacket(packet, this.username, x, z, radius, this.channel);
+		ConsoleIO.println("SPSPacketSession::sendWithPosition -> spsPacket created. Publishing packet " + packet.getClass().getSimpleName());
+		session.publish(spsPacket);
 	}
 
 }
