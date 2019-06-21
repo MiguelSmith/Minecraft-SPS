@@ -7,10 +7,22 @@ import org.koekepan.herobrineproxy.packet.behaviours.login.MigrateLoginSuccessPa
 import org.koekepan.herobrineproxy.packet.behaviours.login.ServerLoginSuccessPacketBehaviour;
 import org.koekepan.herobrineproxy.packet.behaviours.login.ServerPlayerPositionPacketBehaviour;
 import org.koekepan.herobrineproxy.packet.behaviours.server.MigrateJoinGamePacketBehaviour;
+import org.koekepan.herobrineproxy.packet.behaviours.server.ServerEntityDestroyPacketBehaviour;
+import org.koekepan.herobrineproxy.packet.behaviours.server.ServerEntityEffectPacketBehaviour;
+import org.koekepan.herobrineproxy.packet.behaviours.server.ServerEntityHeadLookPacketBehaviour;
+import org.koekepan.herobrineproxy.packet.behaviours.server.ServerEntityMetadataPacketBehaviour;
+import org.koekepan.herobrineproxy.packet.behaviours.server.ServerEntityMovementPacketBehaviour;
 import org.koekepan.herobrineproxy.packet.behaviours.server.ServerEntityPositionPacketBehaviour;
+import org.koekepan.herobrineproxy.packet.behaviours.server.ServerEntityPositionRotationPacketBehaviour;
+import org.koekepan.herobrineproxy.packet.behaviours.server.ServerEntityRotationPacketBehaviour;
+import org.koekepan.herobrineproxy.packet.behaviours.server.ServerEntityStatusPacketBehaviour;
+import org.koekepan.herobrineproxy.packet.behaviours.server.ServerEntityTeleportPacketBehaviour;
+import org.koekepan.herobrineproxy.packet.behaviours.server.ServerEntityVelocityPacketBehaviour;
 import org.koekepan.herobrineproxy.packet.behaviours.server.ServerJoinGamePacketBehaviour;
+import org.koekepan.herobrineproxy.packet.behaviours.server.ServerPlayBuiltinSoundPacketBehaviour;
 //import org.koekepan.herobrineproxy.packet.behaviours.server.ServerJoinGamePacketBehaviour;
 import org.koekepan.herobrineproxy.packet.behaviours.server.ServerPluginMessagePacketBehaviour;
+import org.koekepan.herobrineproxy.packet.behaviours.server.ServerSpawnMobPacketBehaviour;
 //import org.koekepan.herobrineproxy.packet.behaviours.login.ServerLoginSuccessPacketBehaviour;
 import org.koekepan.herobrineproxy.session.IProxySessionNew;
 import org.koekepan.herobrineproxy.session.IServerSession;
@@ -56,7 +68,6 @@ public class ServerSessionPacketBehaviours extends BehaviourHandler<Packet> {
 		registerBehaviour(ServerSpawnObjectPacket.class, clientForwarder);
 		registerBehaviour(ServerSpawnExpOrbPacket.class, clientForwarder);
 		registerBehaviour(ServerSpawnGlobalEntityPacket.class, clientForwarder);
-		registerBehaviour(ServerSpawnMobPacket.class, clientForwarder);
 		registerBehaviour(ServerSpawnPaintingPacket.class, clientForwarder);
 		registerBehaviour(ServerSpawnPlayerPacket.class, clientForwarder);
 		registerBehaviour(ServerStatisticsPacket.class, clientForwarder);
@@ -96,7 +107,6 @@ public class ServerSessionPacketBehaviours extends BehaviourHandler<Packet> {
 		registerBehaviour(ServerPlayerUseBedPacket.class, clientForwarder);
 		registerBehaviour(ServerResourcePackSendPacket.class, clientForwarder);
 		registerBehaviour(ServerRespawnPacket.class, clientForwarder);
-		registerBehaviour(ServerEntityHeadLookPacket.class, clientForwarder);
 		registerBehaviour(ServerWorldBorderPacket.class, clientForwarder);
 		registerBehaviour(ServerSwitchCameraPacket.class, clientForwarder);
 		registerBehaviour(ServerPlayerChangeHeldItemPacket.class, clientForwarder);
@@ -112,32 +122,61 @@ public class ServerSessionPacketBehaviours extends BehaviourHandler<Packet> {
 		registerBehaviour(ServerSpawnPositionPacket.class, clientForwarder);
 		registerBehaviour(ServerUpdateTimePacket.class, clientForwarder);
 		registerBehaviour(ServerTitlePacket.class, clientForwarder);
-		registerBehaviour(ServerPlayBuiltinSoundPacket.class, clientForwarder);
 		registerBehaviour(ServerPlayerListDataPacket.class, clientForwarder);
+		registerBehaviour(ServerEntityAnimationPacket.class, clientForwarder);
+		registerBehaviour(ServerEntityRemoveEffectPacket.class, clientForwarder);
+		registerBehaviour(ServerEntityAttachPacket.class, clientForwarder);
+		registerBehaviour(ServerEntityEquipmentPacket.class, clientForwarder);
+		registerBehaviour(ServerEntityCollectItemPacket.class, clientForwarder);
+		registerBehaviour(ServerEntityPropertiesPacket.class, clientForwarder);
 		
 		registerBehaviour(StatusResponsePacket.class, clientForwarder);
 		registerBehaviour(StatusPongPacket.class, clientForwarder);
 		
 		registerBehaviour(ServerPluginMessagePacket.class, new ServerPluginMessagePacketBehaviour(proxySession));
 		
-		// everything to do with entities
-		registerBehaviour(ServerEntityPositionPacket.class, new ServerEntityPositionPacketBehaviour(entityTracker, proxySession,serverSession));
+		///////////////////////////////////
+		// everything to do with entities//
+		///////////////////////////////////
+		
+		registerBehaviour(ServerEntityPositionPacket.class, new ServerEntityPositionPacketBehaviour(entityTracker));
 		//registerBehaviour(ServerEntityPositionPacket.class, clientForwarder);
-		registerBehaviour(ServerEntityPositionRotationPacket.class, clientForwarder);
-		registerBehaviour(ServerEntityRotationPacket.class, clientForwarder);
-		registerBehaviour(ServerEntityMovementPacket.class, clientForwarder);
-		registerBehaviour(ServerEntityAnimationPacket.class, clientForwarder);
-		registerBehaviour(ServerEntityStatusPacket.class, clientForwarder);
-		registerBehaviour(ServerEntityDestroyPacket.class, clientForwarder);
-		registerBehaviour(ServerEntityRemoveEffectPacket.class, clientForwarder);
-		registerBehaviour(ServerEntityMetadataPacket.class, clientForwarder);
-		registerBehaviour(ServerEntityAttachPacket.class, clientForwarder);
-		registerBehaviour(ServerEntityVelocityPacket.class, clientForwarder);
-		registerBehaviour(ServerEntityEquipmentPacket.class, clientForwarder);
-		registerBehaviour(ServerEntityCollectItemPacket.class, clientForwarder);
-		registerBehaviour(ServerEntityTeleportPacket.class, clientForwarder);
-		registerBehaviour(ServerEntityPropertiesPacket.class, clientForwarder);
-		registerBehaviour(ServerEntityEffectPacket.class, clientForwarder);
+		
+		registerBehaviour(ServerEntityPositionRotationPacket.class, new ServerEntityPositionRotationPacketBehaviour(entityTracker));
+		//registerBehaviour(ServerEntityPositionRotationPacket.class, clientForwarder);
+		
+		registerBehaviour(ServerEntityRotationPacket.class, new ServerEntityRotationPacketBehaviour(entityTracker));
+		//registerBehaviour(ServerEntityRotationPacket.class, clientForwarder);
+		
+		registerBehaviour(ServerEntityMovementPacket.class, new ServerEntityMovementPacketBehaviour(entityTracker));
+		//registerBehaviour(ServerEntityMovementPacket.class, clientForwarder);
+		
+		registerBehaviour(ServerEntityStatusPacket.class, new ServerEntityStatusPacketBehaviour(entityTracker));
+		//registerBehaviour(ServerEntityStatusPacket.class, clientForwarder);
+		
+		registerBehaviour(ServerEntityDestroyPacket.class, new ServerEntityDestroyPacketBehaviour(entityTracker));		
+		//registerBehaviour(ServerEntityDestroyPacket.class, clientForwarder);
+		
+		registerBehaviour(ServerEntityMetadataPacket.class, new ServerEntityMetadataPacketBehaviour(entityTracker));
+		//registerBehaviour(ServerEntityMetadataPacket.class, clientForwarder);
+		
+		registerBehaviour(ServerEntityVelocityPacket.class, new ServerEntityVelocityPacketBehaviour(entityTracker));
+		//registerBehaviour(ServerEntityVelocityPacket.class, clientForwarder);
+		
+		registerBehaviour(ServerEntityTeleportPacket.class, new ServerEntityTeleportPacketBehaviour(entityTracker));
+		//registerBehaviour(ServerEntityTeleportPacket.class, clientForwarder);
+		
+		registerBehaviour(ServerEntityEffectPacket.class, new ServerEntityEffectPacketBehaviour(entityTracker));
+		//registerBehaviour(ServerEntityEffectPacket.class, clientForwarder);
+		
+		registerBehaviour(ServerEntityHeadLookPacket.class, new ServerEntityHeadLookPacketBehaviour(entityTracker));
+		//registerBehaviour(ServerEntityHeadLookPacket.class, clientForwarder);
+		
+		registerBehaviour(ServerSpawnMobPacket.class, new ServerSpawnMobPacketBehaviour(entityTracker));
+		//registerBehaviour(ServerSpawnMobPacket.class, clientForwarder);
+		
+		registerBehaviour(ServerPlayBuiltinSoundPacket.class, new ServerPlayBuiltinSoundPacketBehaviour(entityTracker));
+		//registerBehaviour(ServerPlayBuiltinSoundPacket.class, clientForwarder);
 	}
 	
 	

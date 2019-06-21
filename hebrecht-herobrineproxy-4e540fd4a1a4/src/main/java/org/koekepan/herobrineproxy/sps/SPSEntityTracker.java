@@ -16,7 +16,7 @@ public class SPSEntityTracker {
 	public SPSEntityTracker() {}
 	
 	public SPSEntityTracker(ISession spsSession) {
-		ConsoleIO.println("SPSEntityTracker::constructor -> EntityTracker created");
+		ConsoleIO.println("SPSEntityTracker::constructor -> EntityTracker created with session " + spsSession.getClass().getSimpleName());
 		entities = new HashMap<>();
 		
 		this.spsSession = spsSession;
@@ -36,12 +36,19 @@ public class SPSEntityTracker {
 	
 	public void updateEntity(int entityID, SPSEntity entity, Packet packet) {
 		entities.put(entityID, entity);
-		ConsoleIO.println("SPSEntityTracker::updateEntity -> stored entity. Sending packet as point publication.");
 		try {
-		spsSession.sendWithPosition(packet, entity.getX(), entity.getZ(), 0);
+			if (spsSession.isPositioned()) {
+				spsSession.sendWithPosition(packet, (int) entity.getX(), (int) entity.getZ(), 0);
+			} else {
+				spsSession.sendPacket(packet);
+			}
 		} catch (NullPointerException e)
 		{
 			// this will happen on client side
 		}
+	}
+	
+	public void forwardPacketWithPosition(Packet packet, int x, int y, int radius) {
+		spsSession.sendWithPosition(packet, x, y, radius);
 	}
 }

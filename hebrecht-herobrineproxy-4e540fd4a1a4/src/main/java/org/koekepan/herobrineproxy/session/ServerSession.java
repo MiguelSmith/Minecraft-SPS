@@ -352,4 +352,18 @@ public class ServerSession implements IServerSession {
 		// TODO Auto-generated method stub
 		
 	}
+
+
+	@Override
+	public void setPositioned(boolean positioned) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public boolean isPositioned() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

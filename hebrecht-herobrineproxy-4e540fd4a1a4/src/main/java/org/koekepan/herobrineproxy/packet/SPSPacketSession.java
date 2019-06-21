@@ -20,6 +20,7 @@ public class SPSPacketSession implements IPacketSession {
 	private int radius;
 	
 	private boolean login;
+	private boolean positioned;
 	
 	private ISPSConnection session;
 	
@@ -92,6 +93,14 @@ public class SPSPacketSession implements IPacketSession {
 		return this.login;
 	}
 	
+	public void setPositioned(boolean positioned) {
+		this.positioned = positioned;
+	}
+	
+	public boolean isPositioned() {
+		return this.positioned;
+	}
+	
 	public void updatePosition(Packet movementPacket) {
 		// TODO make this less rough
 		try {
@@ -109,6 +118,7 @@ public class SPSPacketSession implements IPacketSession {
 			z = (int) packet.getZ();
 			//ConsoleIO.println("SPSPacketSession::SetPosition -> Setting position to <" + packet.getX() + "," + packet.getY() + ">");
 		}
+		this.positioned = true;
 	}
 
 	public void setPositionAndMove(Packet responsePacket) {
@@ -125,8 +135,6 @@ public class SPSPacketSession implements IPacketSession {
 
 	public void sendWithPosition(Packet packet, int x, int z, int radius) {
 		SPSPacket spsPacket = new SPSPacket(packet, this.username, x, z, radius, this.channel);
-		ConsoleIO.println("SPSPacketSession::sendWithPosition -> spsPacket created. Publishing packet " + packet.getClass().getSimpleName());
 		session.publish(spsPacket);
 	}
-
 }

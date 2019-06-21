@@ -196,6 +196,18 @@ public class SPSSession implements IServerSession {
 	public void sendWithPosition(Packet packet, int x, int z, int radius) {
 		packetSession.sendWithPosition(packet,x,z,radius);
 	}
+
+
+	@Override
+	public void setPositioned(boolean positioned) {
+		packetSession.setPositioned(positioned);
+	}
+
+
+	@Override
+	public boolean isPositioned() {
+		return packetSession.isPositioned();
+	}
 	
 	
 }
