@@ -31,6 +31,6 @@ public class ServerPlayerPositionPacketBehaviour implements Behaviour<Packet> {
 		proxySession.sendPacketToServer(responsePacket);
 		//proxySession.setPosition(p);
 		proxySession.sendPacketToClient(packet);
-		proxySession.setPacketForwardingBehaviour();
+		proxySession.setPacketSPSForwardingBehaviour();
 	}
 }

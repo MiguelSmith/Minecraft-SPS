@@ -163,4 +163,11 @@ public class ClientToSPSProxy implements IProxySessionNew {
 	public void setPosition(Packet responsePacket) {
 		serverSession.setPosition(responsePacket);
 	}
+
+
+	@Override
+	public void setPacketSPSForwardingBehaviour() {
+		// TODO Auto-generated method stub
+		
+	}
 }

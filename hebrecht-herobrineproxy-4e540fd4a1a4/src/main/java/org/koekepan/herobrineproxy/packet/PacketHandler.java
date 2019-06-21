@@ -3,6 +3,8 @@ package org.koekepan.herobrineproxy.packet;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import com.github.steveice10.mc.protocol.packet.ingame.server.entity.ServerEntityMovementPacket;
+import com.github.steveice10.mc.protocol.packet.ingame.server.entity.ServerEntityPositionRotationPacket;
 import com.github.steveice10.mc.protocol.packet.ingame.server.entity.player.ServerPlayerPositionRotationPacket;
 import com.github.steveice10.mc.protocol.packet.login.server.LoginSuccessPacket;
 import com.github.steveice10.packetlib.packet.Packet;
@@ -126,16 +128,6 @@ public class PacketHandler implements Runnable, PacketListener {
 				//ConsoleIO.println("\n\n Packet: " + packet.getClass().getSimpleName() + " to "+ packetSession.getClass().getSimpleName() +"\n ");
 				
 				packetSession.send(packet);
-				
-				/*
-				// if server receives instance of LoginPacketSuccess then switch to ingame protocol
-				// NOTE: client will set PacketSession, not SPSPacketSession, so subscribing needs to happen from SPSConnection
-				if (packet instanceof LoginSuccessPacket) {
-					ConsoleIO.println("PacketHandler::run Changing channel to 'ingame' " + packetSession.getClass().getSimpleName());
-					packetSession.setChannel("ingame");
-					packetSession.subscribeSession("ingame");
-				}
-				*/
 			}			
 		} catch (Exception e) {
 			ConsoleIO.println("PacketHandler::run => Exception occurred while processing packet <"+packet.getClass().getSimpleName()+">");

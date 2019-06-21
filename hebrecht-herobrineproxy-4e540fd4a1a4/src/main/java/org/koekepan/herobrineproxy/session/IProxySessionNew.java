@@ -26,4 +26,5 @@ public interface IProxySessionNew {
 	void setPacketForwardingBehaviour();
 	void registerForPluginChannels();
 	public void setPosition(Packet packet);
+	void setPacketSPSForwardingBehaviour();
 }

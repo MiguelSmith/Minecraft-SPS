@@ -159,4 +159,11 @@ public class ProxySessionV3 implements IProxySessionNew {
 		// TODO Auto-generated method stub
 		
 	}
+
+
+	@Override
+	public void setPacketSPSForwardingBehaviour() {
+		// TODO Auto-generated method stub
+		
+	}
 }

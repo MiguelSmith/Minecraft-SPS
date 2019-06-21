@@ -8,6 +8,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.koekepan.herobrineproxy.ConsoleIO;
 
+import com.github.steveice10.mc.protocol.packet.ingame.server.entity.ServerEntityMovementPacket;
+import com.github.steveice10.mc.protocol.packet.ingame.server.entity.ServerEntityPositionRotationPacket;
+
 public class BehaviourHandler<T> {
 	
 	private final Map<Class<? extends T>, Behaviour<T>> behaviours = new ConcurrentHashMap<Class<? extends T>, Behaviour<T>>();
