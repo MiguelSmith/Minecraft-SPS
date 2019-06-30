@@ -8,6 +8,9 @@ public class SPSEntity {
 	private double x;
 	private double y;
 	private double z;
+	private double prevX;
+	private double prevY;
+	private double prevZ;
 	private int entityID;
 	private java.util.UUID UUID;
 	private MobType type;
@@ -25,7 +28,7 @@ public class SPSEntity {
 		this.x = x;
 		this.y = y;
 		this.z = z;
-		ConsoleIO.println("SPSEntity::constructor -> entity " + entityID + " created at <" + x + "," + z + ">");
+		//ConsoleIO.println("SPSEntity::constructor -> entity " + entityID + " created at <" + x + "," + z + ">");
 	}
 	
 	public SPSEntity(int entityID, java.util.UUID uuid, MobType mobType, double x, double y, double z, float yaw, float pitch, float headYaw, double velX, double velY, double velZ) {
@@ -129,8 +132,35 @@ public class SPSEntity {
 	}
 	
 	public void move(double x, double y, double z) {
+		this.setPrevX(this.x);
+		this.setPrevY(this.y);
+		this.setPrevZ(this.z);
 		this.x += x;
 		this.y += y;
 		this.z += z;
+	}
+
+	public double getPrevX() {
+		return prevX;
+	}
+
+	public void setPrevX(double prevX) {
+		this.prevX = prevX;
+	}
+
+	public double getPrevY() {
+		return prevY;
+	}
+
+	public void setPrevY(double prevY) {
+		this.prevY = prevY;
+	}
+
+	public double getPrevZ() {
+		return prevZ;
+	}
+
+	public void setPrevZ(double prevZ) {
+		this.prevZ = prevZ;
 	}
 }

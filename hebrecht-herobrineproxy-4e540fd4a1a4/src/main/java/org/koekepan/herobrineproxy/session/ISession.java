@@ -19,7 +19,7 @@ public interface ISession {
 	public void packetReceived(Packet packet);
 	public void setPacketBehaviours(BehaviourHandler<Packet> behaviours);
 	void setPosition(Packet packet);
-	void sendWithPosition(Packet packet, int x, int z, int radius);
+	void sendWithPosition(Packet packet, double x, double z, double prevX, double prevZ, int radius);
 	public void setPositioned(boolean positioned);
 	public boolean isPositioned();
 }

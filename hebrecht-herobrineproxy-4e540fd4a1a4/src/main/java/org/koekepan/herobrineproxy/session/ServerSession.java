@@ -348,13 +348,6 @@ public class ServerSession implements IServerSession {
 
 
 	@Override
-	public void sendWithPosition(Packet packet, int x, int z, int radius) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
 	public void setPositioned(boolean positioned) {
 		// TODO Auto-generated method stub
 		
@@ -365,5 +358,12 @@ public class ServerSession implements IServerSession {
 	public boolean isPositioned() {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+
+	@Override
+	public void sendWithPosition(Packet packet, double x, double z, double prevX, double prevZ, int radius) {
+		// TODO Auto-generated method stub
+		
 	}
 }

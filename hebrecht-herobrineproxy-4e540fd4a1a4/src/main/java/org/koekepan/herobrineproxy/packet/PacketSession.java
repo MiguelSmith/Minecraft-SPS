@@ -63,4 +63,11 @@ public class PacketSession implements IPacketSession {
 		// TODO Auto-generated method stub
 		
 	}
+
+
+	@Override
+	public void moveEntity(Packet packet, int positionType) {
+		// TODO Auto-generated method stub
+		
+	}
 }

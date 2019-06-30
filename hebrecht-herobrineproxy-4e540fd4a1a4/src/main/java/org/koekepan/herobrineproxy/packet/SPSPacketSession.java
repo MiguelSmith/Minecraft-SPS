@@ -133,8 +133,14 @@ public class SPSPacketSession implements IPacketSession {
 	}
 
 
-	public void sendWithPosition(Packet packet, int x, int z, int radius) {
-		SPSPacket spsPacket = new SPSPacket(packet, this.username, x, z, radius, this.channel);
+	public void sendWithPosition(Packet packet, double x, double z, double prevX, double prevZ, int radius) {
+		SPSPacket spsPacket = new SPSPacket(packet, this.username, (int) x, (int) z, radius, this.channel);
 		session.publish(spsPacket);
+	}
+
+
+	@Override
+	public void moveEntity(Packet packet, int positionType) {
+		
 	}
 }

@@ -23,7 +23,7 @@ public class ServerSpawnMobPacketBehaviour implements Behaviour<Packet> {
 	public void process(Packet packet) {
 		ServerSpawnMobPacket p = (ServerSpawnMobPacket) packet;
 		int entityID = p.getEntityId();
-		ConsoleIO.println("Received ServerSpawnMobPacket <"+ p.getX() +","+p.getY()+","+ p.getZ()+">");
+		//ConsoleIO.println("Received ServerSpawnMobPacket <"+ p.getX() +","+p.getY()+","+ p.getZ()+">");
 		SPSEntity entity = new SPSEntity(entityID, p.getUUID(), p.getType(), p.getX(), p.getY(), p.getZ(), p.getYaw(),  p.getPitch(), p.getHeadYaw(), p.getMotionX(), p.getMotionY(), p.getMotionZ());
 		entityTracker.updateEntity(entityID, entity, packet);
 	}

@@ -11,4 +11,5 @@ public interface IPacketSession {
 	public void setLogin(boolean login);
 	public boolean getLogin();
 	public void updatePosition(Packet movementPacket);
+	public void moveEntity(Packet packet, int positionType);
 }

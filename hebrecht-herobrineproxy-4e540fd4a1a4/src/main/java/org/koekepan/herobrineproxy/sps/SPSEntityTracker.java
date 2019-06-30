@@ -38,7 +38,7 @@ public class SPSEntityTracker {
 		entities.put(entityID, entity);
 		try {
 			if (spsSession.isPositioned()) {
-				spsSession.sendWithPosition(packet, (int) entity.getX(), (int) entity.getZ(), 0);
+				spsSession.sendWithPosition(packet,entity.getX(),entity.getZ(), entity.getPrevX(), entity.getPrevZ(), 0);
 			} else {
 				spsSession.sendPacket(packet);
 			}
@@ -49,6 +49,6 @@ public class SPSEntityTracker {
 	}
 	
 	public void forwardPacketWithPosition(Packet packet, int x, int y, int radius) {
-		spsSession.sendWithPosition(packet, x, y, radius);
+		spsSession.sendWithPosition(packet, x, y, x, y, radius);
 	}
 }
