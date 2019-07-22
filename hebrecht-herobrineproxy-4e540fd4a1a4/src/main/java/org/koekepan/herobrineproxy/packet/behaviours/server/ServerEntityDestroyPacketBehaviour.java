@@ -27,7 +27,7 @@ public class ServerEntityDestroyPacketBehaviour implements Behaviour<Packet> {
 			for (int i = 0; i < entityID.length; i++) {
 				int j = entityID[i];
 				SPSEntity entity = entityTracker.getEntity(j);
-				//ConsoleIO.println("Received ServerEntityPositionRotationPacket  <"+ entity.getX()+","+entity.getY()+","+ entity.getZ()+">");
+				ConsoleIO.println("ServerEntityDestroyPacket::process => Destroy entity " + j + " at <"+ entity.getX()+","+entity.getY()+","+ entity.getZ()+">");
 				entityTracker.updateEntity(j, entity, packet);
 			}
 		} catch (Exception e) {

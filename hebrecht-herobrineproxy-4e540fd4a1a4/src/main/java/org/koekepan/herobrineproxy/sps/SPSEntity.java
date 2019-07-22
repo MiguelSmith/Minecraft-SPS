@@ -28,6 +28,9 @@ public class SPSEntity {
 		this.x = x;
 		this.y = y;
 		this.z = z;
+		this.prevX = x;
+		this.prevY = y;
+		this.prevZ = z;
 		//ConsoleIO.println("SPSEntity::constructor -> entity " + entityID + " created at <" + x + "," + z + ">");
 	}
 	

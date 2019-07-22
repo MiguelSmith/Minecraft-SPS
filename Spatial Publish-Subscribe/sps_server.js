@@ -35,7 +35,7 @@ var differenceType =
 {
     "INSIDE":0,
     "LIMBO":1,
-    "OUTSIDE"2
+    "OUTSIDE":2
 }
 
 // is there a lobby server
@@ -210,16 +210,13 @@ var _contains = function (sub, pubX, pubY, pubAoI) {
     var dy = sub.y - pubY;
     var dist = Math.sqrt(Math.pow(dx,2) + Math.pow(dy,2));
 
-    //console.log("pubAoI: " + pubAoI + " sub.AoI: " + sub.AoI + " Distance: " + dist + " subPos: <"+sub.x+","+sub.y+"> pubPos: <"+pubX+","+pubY+">");
+    var difference = sub.AoI - dist;
+    console.log("pubAoI: " + pubAoI + " sub.AoI: " + sub.AoI + " Distance: " + dist + " Difference: " + difference);
 
-    var difference = pubAoI + sub.AoI - dist;
-
-    if (difference < 0) {
-        return INSIDE;
-    } else if (distance >= 0 && distance < 1) {
-        return LIMBO;
+    if (difference >= 0) {
+        return true;
     }
-    return OUTSIDE;
+    return false;
 }
 
 var _subscribe = function (socket, channel, name, x, y, AoI) {
@@ -278,7 +275,7 @@ var _subscribe = function (socket, channel, name, x, y, AoI) {
 }
 
 var _publish = function(socket, connectionID, player, x, y, radius, payload, channel, packetName) {
-    //console.log("Attempting to send packet " + packetName + " from " + connectionID + " to channel " + channel + " for player " + player + " at <" + x + "," + y + "> for radius " + radius);
+    console.log("Attempting to send packet " + packetName + " from " + connectionID + " to channel " + channel + " for player " + player + " at <" + x + "," + y + "> for radius " + radius);
 
     if (!subscriberList.hasOwnProperty(channel)) {
         console.log("Trying to publish to a channel that does not exist: " + channel);
@@ -294,17 +291,16 @@ var _publish = function(socket, connectionID, player, x, y, radius, payload, cha
         if (sub.connectionID == connectionID)
             continue;
 
-        var publishPosition = _contains(sub, x, y, radius);
-        if (publishPosition <= 1) {
+        if (_contains(sub, x, y, radius)) {
             // if the lobby channel is getting the message, make sure to use the given username.
             // else use the subscription username
             // only necessary for aggregation of packets so we won't implement it here.
             // player = channel == "lobby" ? player : sub.name;
             //console.log("Publishing to " + sub.subID);
 
-            //console.log("Confirming sending packet " + packetName + " from "+connectionID+" to channel " + channel + " for player " + player + " at <" + x + "," + y + "> for radius " + radius);
+            console.log("Confirming sending packet " + packetName + " from "+connectionID+" to channel " + channel + " for player " + player + " at <" + x + "," + y + "> for radius " + radius);
 
-            socket.broadcast.to(connectionInfoList[sub.connectionID].socket.id).emit('publication', connectionID, player, x, y, radius, payload, channel, publishPosition);
+            socket.broadcast.to(connectionInfoList[sub.connectionID].socket.id).emit('publication', connectionID, player, x, y, radius, payload, channel, 0);
         }
     }
 }

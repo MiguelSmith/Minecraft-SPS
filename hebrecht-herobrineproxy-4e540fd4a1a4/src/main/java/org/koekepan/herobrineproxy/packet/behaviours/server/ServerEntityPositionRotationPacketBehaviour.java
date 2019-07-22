@@ -23,11 +23,12 @@ public class ServerEntityPositionRotationPacketBehaviour implements Behaviour<Pa
 		ServerEntityPositionRotationPacket p = (ServerEntityPositionRotationPacket) packet;
 		int entityID = p.getEntityId();
 		try {
-			SPSEntity entity = entityTracker.getEntity(entityID);
+			//SPSEntity entity = entityTracker.getEntity(entityID);
 			//ConsoleIO.println("Received ServerEntityPositionRotationPacket  <"+ entity.getX()+","+entity.getY()+","+ entity.getZ()+">");
-			entity.setPitch(p.getPitch());
-			entity.setYaw(p.getYaw());
-			entity.move(p.getMovementX(), p.getMovementY(),p.getMovementZ());
+			//entity.setPitch(p.getPitch());
+			//entity.setYaw(p.getYaw());
+			//entity.move(p.getMovementX(), p.getMovementY(),p.getMovementZ());
+			SPSEntity entity = new SPSEntity(entityID,p.getMovementX(), p.getMovementY(),p.getMovementZ());
 			entityTracker.updateEntity(entityID, entity, packet);
 		} catch (Exception e) {
 			ConsoleIO.println("ServerEntityPositionRotationPacketBehaviour::process -> Entity " + entityID + " could not be found.");

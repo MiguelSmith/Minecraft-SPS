@@ -23,9 +23,10 @@ public class ServerEntityPositionPacketBehaviour implements Behaviour<Packet> {
 		ServerEntityPositionPacket p = (ServerEntityPositionPacket) packet;
 		int entityID = p.getEntityId();
 		try {
-			SPSEntity entity = entityTracker.getEntity(entityID);
+			//SPSEntity entity = entityTracker.getEntity(entityID);
 			//ConsoleIO.println("Received ServerEntityPositionPacket  <"+ entity.getX()+","+entity.getY()+","+ entity.getZ()+">");
-			entity.move(p.getMovementX(), p.getMovementY(),p.getMovementZ());
+			//entity.move(p.getMovementX(), p.getMovementY(),p.getMovementZ());
+			SPSEntity entity = new SPSEntity(entityID,p.getMovementX(), p.getMovementY(),p.getMovementZ());
 			entityTracker.updateEntity(entityID, entity, packet);
 		} catch (Exception e) {
 			ConsoleIO.println("ServerEntityPositionPacketBehaviour::process -> Entity " + entityID + " could not be found.");

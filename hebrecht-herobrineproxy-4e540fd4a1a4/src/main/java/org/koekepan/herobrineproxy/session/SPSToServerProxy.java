@@ -86,6 +86,7 @@ public class SPSToServerProxy implements IProxySessionNew {
 		
 		this.serverPacketBehaviours = new ServerSessionPacketBehaviours(this, serverSession);
 		this.serverPacketBehaviours.registerSPSBehaviour(entityTracker);
+		//this.serverPacketBehaviours.registerForwardingBehaviour();
 		this.serverSession.setPacketBehaviours(serverPacketBehaviours);	
 		serverSession.connect();
 	}
@@ -153,6 +154,7 @@ public class SPSToServerProxy implements IProxySessionNew {
 	@Override
 	public void setPacketSPSForwardingBehaviour() {
 		this.serverPacketBehaviours.registerSPSBehaviour(entityTracker);
+		//this.serverPacketBehaviours.registerForwardingBehaviour();
 	}
 	
 	

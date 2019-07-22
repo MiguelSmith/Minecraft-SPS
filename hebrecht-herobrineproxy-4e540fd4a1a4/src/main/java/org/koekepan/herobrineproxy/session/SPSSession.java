@@ -15,6 +15,7 @@ import org.koekepan.herobrineproxy.packet.PacketHandler;
 import org.koekepan.herobrineproxy.packet.SPSPacketSession;
 import org.koekepan.herobrineproxy.packet.behaviours.DefaultPacketBehaviours;
 import org.koekepan.herobrineproxy.sps.ISPSConnection;
+import org.koekepan.herobrineproxy.sps.SPSEntityTracker;
 
 import com.github.steveice10.mc.protocol.packet.ingame.client.ClientPluginMessagePacket;
 import com.github.steveice10.mc.protocol.packet.ingame.client.player.ClientPlayerPositionRotationPacket;
@@ -207,6 +208,12 @@ public class SPSSession implements IServerSession {
 	@Override
 	public boolean isPositioned() {
 		return packetSession.isPositioned();
+	}
+
+
+	@Override
+	public void setEntityTracker(SPSEntityTracker entityTracker) {
+		packetSession.setEntityTracker(entityTracker);		
 	}
 	
 	

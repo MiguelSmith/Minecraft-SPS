@@ -1,6 +1,7 @@
 package org.koekepan.herobrineproxy.session;
 
 import org.koekepan.herobrineproxy.behaviour.BehaviourHandler;
+import org.koekepan.herobrineproxy.sps.SPSEntityTracker;
 
 import com.github.steveice10.mc.protocol.packet.ingame.client.player.ClientPlayerPositionRotationPacket;
 import com.github.steveice10.mc.protocol.packet.ingame.server.entity.player.ServerPlayerPositionRotationPacket;
@@ -22,4 +23,5 @@ public interface ISession {
 	void sendWithPosition(Packet packet, double x, double z, double prevX, double prevZ, int radius);
 	public void setPositioned(boolean positioned);
 	public boolean isPositioned();
+	public void setEntityTracker(SPSEntityTracker spsEntityTracker);
 }

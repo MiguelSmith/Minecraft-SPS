@@ -25,9 +25,11 @@ import com.github.steveice10.mc.protocol.packet.ingame.client.player.ClientPlaye
 import com.github.steveice10.mc.protocol.packet.ingame.server.ServerChatPacket;
 import com.github.steveice10.mc.protocol.packet.ingame.server.ServerJoinGamePacket;
 import com.github.steveice10.mc.protocol.packet.ingame.server.ServerPlayerListEntryPacket;
+import com.github.steveice10.mc.protocol.packet.ingame.server.entity.ServerEntityDestroyPacket;
 import com.github.steveice10.mc.protocol.packet.ingame.server.entity.ServerEntityPositionPacket;
 import com.github.steveice10.mc.protocol.packet.ingame.server.entity.ServerEntityPositionRotationPacket;
 import com.github.steveice10.mc.protocol.packet.ingame.server.entity.player.ServerPlayerPositionRotationPacket;
+import com.github.steveice10.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnPlayerPacket;
 import com.github.steveice10.mc.protocol.packet.login.client.LoginStartPacket;
 import com.github.steveice10.mc.protocol.packet.login.server.LoginSetCompressionPacket;
 import com.github.steveice10.mc.protocol.packet.login.server.LoginSuccessPacket;
@@ -114,7 +116,6 @@ public class SPSConnection implements ISPSConnection {
 				int x = packet.x;
 				int y = packet.y;
 				int radius = packet.radius;
-				int positionType = (int) data[7];
 				
 				// TODO: look at possible polymorphic implementation of this. Create new interface to handle publish-time packet behaviours
 				// eg. packet.publish() -> do checks or nothing depending on packet type instead of "instanceof" implementation
@@ -158,8 +159,8 @@ public class SPSConnection implements ISPSConnection {
 						}
 					} else if (packet.packet instanceof ClientPlayerPositionRotationPacket || packet.packet instanceof ClientPlayerPositionPacket) {
 						sessions.get(username).updatePosition(packet.packet);
-					} else if (packet.packet instanceof ServerEntityPositionPacket || packet.packet instanceof ServerEntityPositionRotationPacket) {
-						sessions.get(username).moveEntity(packet.packet, positionType);
+					}  else if (packet.packet instanceof ServerSpawnPlayerPacket || packet.packet instanceof ServerEntityDestroyPacket) {
+						ConsoleIO.println("Received packet " + packet.packet.getClass().getSimpleName());
 					}
 					
 					listeners.get(username).sendPacket(packet.packet);

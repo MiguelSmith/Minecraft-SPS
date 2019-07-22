@@ -12,6 +12,7 @@ import org.koekepan.herobrineproxy.packet.PacketAdapter;
 import org.koekepan.herobrineproxy.packet.PacketHandler;
 import org.koekepan.herobrineproxy.packet.PacketSession;
 import org.koekepan.herobrineproxy.packet.behaviours.DefaultPacketBehaviours;
+import org.koekepan.herobrineproxy.sps.SPSEntityTracker;
 
 import com.github.steveice10.mc.protocol.packet.ingame.client.player.ClientPlayerPositionRotationPacket;
 import com.github.steveice10.mc.protocol.packet.ingame.server.entity.player.ServerPlayerPositionRotationPacket;
@@ -130,6 +131,12 @@ public class ClientSession implements IClientSession {
 
 	@Override
 	public void sendWithPosition(Packet packet, double x, double z, double prevX, double prevZ, int radius) {
+				
+	}
+
+
+	@Override
+	public void setEntityTracker(SPSEntityTracker spsEntityTracker) {
 		// TODO Auto-generated method stub
 		
 	}

@@ -2,6 +2,7 @@ package org.koekepan.herobrineproxy.packet;
 
 import org.koekepan.herobrineproxy.ConsoleIO;
 import org.koekepan.herobrineproxy.sps.ISPSConnection;
+import org.koekepan.herobrineproxy.sps.SPSEntityTracker;
 import org.koekepan.herobrineproxy.sps.SPSPacket;
 
 import com.github.steveice10.mc.protocol.packet.ingame.client.player.ClientPlayerPositionPacket;
@@ -23,11 +24,12 @@ public class SPSPacketSession implements IPacketSession {
 	private boolean positioned;
 	
 	private ISPSConnection session;
+	private SPSEntityTracker entityTracker;
 	
 	public SPSPacketSession(ISPSConnection session) {
 		this.session = session;
 		
-		this.radius = 5;
+		this.radius = 65;
 	}
 		
 	
@@ -36,7 +38,7 @@ public class SPSPacketSession implements IPacketSession {
 		this.username = username;
 		this.channel = channel;
 		
-		this.radius = 5;
+		this.radius = 65;
 	}
 	
 	@Override
@@ -141,6 +143,11 @@ public class SPSPacketSession implements IPacketSession {
 
 	@Override
 	public void moveEntity(Packet packet, int positionType) {
-		
+		entityTracker.move(packet, positionType);
+	}
+
+
+	public void setEntityTracker(SPSEntityTracker entityTracker) {
+		this.entityTracker = entityTracker;		
 	}
 }
