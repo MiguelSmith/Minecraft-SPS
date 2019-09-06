@@ -122,6 +122,12 @@ public class SPSPacketSession implements IPacketSession {
 		}
 		this.positioned = true;
 	}
+	
+	public void movePosition(Packet responsePacket) {
+		updatePosition(responsePacket);	
+		SPSPacket spsPacket = new SPSPacket(responsePacket, this.username, x, z, radius, channel);
+		session.move(spsPacket);	
+	}
 
 	public void setPositionAndMove(Packet responsePacket) {
 		updatePosition(responsePacket);		
@@ -136,6 +142,7 @@ public class SPSPacketSession implements IPacketSession {
 
 
 	public void sendWithPosition(Packet packet, double x, double z, double prevX, double prevZ, int radius) {
+		//ConsoleIO.println("SPSPacketSession::sendWithPosition => publishing " + packet.getClass().getSimpleName() + " to <" + x + "," + z + "> for user " + this.username);
 		SPSPacket spsPacket = new SPSPacket(packet, this.username, (int) x, (int) z, radius, this.channel);
 		session.publish(spsPacket);
 	}

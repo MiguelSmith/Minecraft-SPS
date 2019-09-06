@@ -1,6 +1,8 @@
 package org.koekepan.herobrineproxy.session;
 
 
+import java.util.UUID;
+
 import org.koekepan.herobrineproxy.ConsoleIO;
 import org.koekepan.herobrineproxy.packet.behaviours.ClientSessionPacketBehaviours;
 import org.koekepan.herobrineproxy.packet.behaviours.ServerSessionPacketBehaviours;
@@ -167,5 +169,25 @@ public class SPSToServerProxy implements IProxySessionNew {
 	@Override
 	public void setPosition(Packet packet) {
 		clientSession.setPosition(packet);		
+	}
+	
+	public void setPlayerUsername(int entityID) {
+		entityTracker.setPlayerUsername(entityID, clientSession.getUsername());
+	}
+	
+	public String getPlayerUsername(int entityID) {
+		return entityTracker.getPlayerUsername(entityID);
+	}
+
+
+	@Override
+	public void setUUID(String username, UUID uuid) {
+		entityTracker.setUUID(username, uuid);
+	}
+
+
+	@Override
+	public UUID getUUID(String username) {
+		return entityTracker.getUUID(username);
 	}
 }

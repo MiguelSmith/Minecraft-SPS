@@ -4,14 +4,15 @@ import com.github.steveice10.mc.protocol.packet.ingame.client.player.ClientPlaye
 import com.github.steveice10.mc.protocol.packet.ingame.server.entity.player.ServerPlayerPositionRotationPacket;
 import com.github.steveice10.packetlib.packet.Packet;
 
-
-import org.koekepan.herobrineproxy.ConsoleIO;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.koekepan.herobrineproxy.behaviour.Behaviour;
 import org.koekepan.herobrineproxy.session.IProxySessionNew;
 import org.koekepan.herobrineproxy.sps.SPSEntityTracker;
 
 public class ServerPlayerPositionPacketBehaviour implements Behaviour<Packet> {
 		
+	static Logger logger =  LogManager.getLogger(ServerPlayerPositionPacketBehaviour.class);
 	private IProxySessionNew proxySession;
 	private SPSEntityTracker entityTracker;
 	
@@ -33,7 +34,7 @@ public class ServerPlayerPositionPacketBehaviour implements Behaviour<Packet> {
 	@Override
 	public void process(Packet packet) {
 		ServerPlayerPositionRotationPacket p = (ServerPlayerPositionRotationPacket) packet;
-		ConsoleIO.println("ServerPlayerPositionRotationPacket::process => Player \""+proxySession.getUsername()+"\" received location: "+p.toString());		
+		//ConsoleIO.println("ServerPlayerPositionRotationPacket::process => Player \""+proxySession.getUsername()+"\" received location: "+p.toString());		
 		ClientPlayerPositionRotationPacket responsePacket = new ClientPlayerPositionRotationPacket(true, p.getX(), p.getY(), p.getZ(), p.getYaw(), p.getPitch());
 		proxySession.sendPacketToServer(responsePacket);
 		//proxySession.setPosition(p);

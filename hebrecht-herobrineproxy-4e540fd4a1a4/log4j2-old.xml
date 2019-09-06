@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO">
+    <Properties>
+        <Property name="basePath">C:\Users\Miguel Smith\Documents\Varsity Work\Masters\Herman proxy\hebrecht-herobrineproxy-4e540fd4a1a4\Logs</Property>
+    </Properties>
+
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+          <PatternLayout pattern="%d{HH:mm:ss.SSS} [%level]: %msg%n" />
+        </Console>
+        <File name="MyFile" fileName="${basePath}/herobrine.log" immediateFlush="true" append="false">
+            <PatternLayout pattern="%d{yyy-MM-dd HH:mm:ss.SSS} [%level]:%msg%n"/>
+        </File>
+        <File name="ServerPositionRotationPacket" fileName="${basePath}/ServerPosRotPacket.log" class="org.koekepan.heronbrineproxy.packet.behaviours.login.ServerPlayerPositionRotationPacketBehaviour" immediateFlush="true" append="false">
+            <PatternLayout pattern="%d{yyy-MM-dd HH:mm:ss.SSS} [%level]:%msg%n"/>
+        </File>
+
+    </Appenders>
+    <Loggers>
+        <Logger name="org.koekepan.heronbrineproxy.packet.behaviours.login.ServerPlayerPositionRotationPacketBehaviour" level="debug">
+            <appender-ref ref="Console" level="debug"/>
+            <appender-ref ref="ServerPositionRotationPacket" level="debug" />
+        </Logger>
+
+        <Root level="debug">
+            <AppenderRef ref="Console" level="INFO"/>
+            <AppenderRef ref="MyFile" level="DEBUG"/>
+        </Root>
+    </Loggers>
+</Configuration>

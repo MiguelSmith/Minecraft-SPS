@@ -1,6 +1,8 @@
 package org.koekepan.herobrineproxy.session;
 
 
+import java.util.UUID;
+
 import org.koekepan.herobrineproxy.ConsoleIO;
 import org.koekepan.herobrineproxy.packet.behaviours.ClientSessionPacketBehaviours;
 import org.koekepan.herobrineproxy.packet.behaviours.ServerSessionPacketBehaviours;
@@ -169,5 +171,33 @@ public class ClientToSPSProxy implements IProxySessionNew {
 	public void setPacketSPSForwardingBehaviour() {
 		// TODO Auto-generated method stub
 		
+	}
+
+
+	@Override
+	public void setPlayerUsername(int entityID) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public String getPlayerUsername(int entityID) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public void setUUID(String username, UUID uuid) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public UUID getUUID(String username) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

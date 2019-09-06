@@ -140,10 +140,10 @@ public class ServerSessionPacketBehaviours extends BehaviourHandler<Packet> {
 		// everything to do with entities//
 		///////////////////////////////////
 		
-		registerBehaviour(ServerEntityPositionPacket.class, new ServerEntityPositionPacketBehaviour(entityTracker));
+		registerBehaviour(ServerEntityPositionPacket.class, new ServerEntityPositionPacketBehaviour(entityTracker, proxySession));
 //		registerBehaviour(ServerEntityPositionPacket.class, clientForwarder);
 		
-		registerBehaviour(ServerEntityPositionRotationPacket.class, new ServerEntityPositionRotationPacketBehaviour(entityTracker));
+		registerBehaviour(ServerEntityPositionRotationPacket.class, new ServerEntityPositionRotationPacketBehaviour(entityTracker, proxySession));
 //		registerBehaviour(ServerEntityPositionRotationPacket.class, clientForwarder);
 		
 		registerBehaviour(ServerEntityRotationPacket.class, new ServerEntityRotationPacketBehaviour(entityTracker));

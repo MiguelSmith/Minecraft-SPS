@@ -25,8 +25,12 @@ public class ServerEntityMetadataPacketBehaviour implements Behaviour<Packet> {
 		int entityID = p.getEntityId();
 		try {
 			SPSEntity entity = entityTracker.getEntity(entityID);
-			//ConsoleIO.println("Received ServerEntityMetadataPacket  <"+ entity.getX()+","+entity.getY()+","+ entity.getZ()+">");
-			entityTracker.updateEntity(entityID, entity, packet);
+			if (entity != null) {
+				//ConsoleIO.println("Received ServerEntityMetadataPacket  <"+ entity.getX()+","+entity.getY()+","+ entity.getZ()+">");
+				entityTracker.updateEntity(entityID, entity, packet);
+			} else {
+				entityTracker.forwardPacketWithPosition(packet, 0, 0, 65);
+			}
 		} catch (Exception e) {
 			ConsoleIO.println("ServerEntityMetadataPacket::process -> Entity " + entityID + " could not be found.");
 		}

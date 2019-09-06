@@ -1,5 +1,7 @@
 package org.koekepan.herobrineproxy.session;
 
+import java.util.UUID;
+
 import com.github.steveice10.mc.protocol.packet.ingame.server.entity.player.ServerPlayerPositionRotationPacket;
 import com.github.steveice10.packetlib.packet.Packet;
 
@@ -27,4 +29,8 @@ public interface IProxySessionNew {
 	void registerForPluginChannels();
 	public void setPosition(Packet packet);
 	void setPacketSPSForwardingBehaviour();
+	public void setPlayerUsername(int entityID);
+	public String getPlayerUsername(int entityID);
+	public void setUUID(String username, UUID uuid);
+	UUID getUUID(String username);
 }

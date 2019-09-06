@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Properties>
+        <Property name="LOG_PATTERN">%d{yyy-MM-dd HH:mm:ss.SSS} [%level]:%msg%n</Property>
+        <Property name="basePath">./Logs</Property>
+    </Properties>
+
+    <Appenders>
+        <!-- Console Appender
+        <Console name="Console" target="SYSTEM_OUT" follow="true">
+          <PatternLayout pattern="%d{HH:mm:ss.SSS} [%level]: %msg%n" />
+        </Console>
+        -->
+
+        <!-- File Appenders -->
+        <RollingFile name="ServerJoinLog" filename="${basePath}/ServerJoinLog.log" filePattern="${basePath}/ServerJoinLog-%i.log" >
+            <LevelRangeFilter minLevel="ERROR" maxLevel="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="200MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10"/>
+        </RollingFile>
+
+        <RollingFile name="ServerMoveLog" filename="${basePath}/ServerMoveLog.log" filePattern="${basePath}/ServerMoveLog-%i.log">
+            <LevelRangeFilter minLevel="INFO" maxLevel="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="200MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10"/>
+        </RollingFile>
+
+
+        <RollingFile name="ServerQuitLog" filename="${basePath}/ServerQuitLog.log" filePattern="${basePath}/ServerQuitLog-%i.log">
+            <LevelRangeFilter minLevel="DEBUG" maxLevel="DEBUG" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="200MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10"/>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <Logger name="org.koekepan.herobrineproxy.packet.behaviours.server" additivity="false">
+            <AppenderRef ref="ServerMoveLog"/>
+        </Logger>
+
+        <Logger name="org.koekepan.herobrineproxy.sps" additivity="false">
+            <AppenderRef ref="ServerQuitLog"/>
+            <AppenderRef ref="ServerJoinLog"/>
+        </Logger>
+
+        <Root level="debug">
+            <!--
+            <AppenderRef ref="Console" level="INFO"/>
+            -->
+        </Root>
+    </Loggers>
+</Configuration>

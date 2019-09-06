@@ -26,7 +26,7 @@ public class ServerJoinGamePacketBehaviour implements Behaviour<Packet> {
 	@Override
 	public void process(Packet packet) {
 		ServerJoinGamePacket serverJoinPacket = (ServerJoinGamePacket) packet;
-		serverJoinPacket.getEntityId();
+		proxySession.setPlayerUsername(serverJoinPacket.getEntityId());
 		//proxySession.setJoined(true);
 		ConsoleIO.println("ServerJoinGamePacketBehaviour::process => Player \""+proxySession.getUsername()+"\" with entityID <"+serverJoinPacket.getEntityId()+"> has successfully joined world");
 		proxySession.sendPacketToClient(packet);

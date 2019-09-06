@@ -1,5 +1,6 @@
 package org.koekepan.herobrineproxy.session;
 
+import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
@@ -139,5 +140,33 @@ public class ClientSession implements IClientSession {
 	public void setEntityTracker(SPSEntityTracker spsEntityTracker) {
 		// TODO Auto-generated method stub
 		
+	}
+
+
+	@Override
+	public void setPlayerUsername(int entityID, String username) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public String getUsername(int entityID) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public void setUUID(String username, UUID uuid) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public UUID getUUID(String username) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

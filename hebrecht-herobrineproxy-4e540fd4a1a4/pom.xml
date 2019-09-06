@@ -30,6 +30,11 @@
 			<id>jitpack.io</id>
 			<url>https://jitpack.io</url>
 		</repository>
+		
+		<repository>
+		    <id>dmulloy2-repo</id>
+		    <url>http://repo.dmulloy2.net/nexus/repository/public/</url>
+		</repository>
 	</repositories>
  
  	<dependencies>
@@ -57,6 +62,13 @@
   			<version>2.6.2</version>
   		</dependency>
   		
+  		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-csv -->
+		<dependency>
+		    <groupId>org.apache.commons</groupId>
+		    <artifactId>commons-csv</artifactId>
+		    <version>1.4</version>
+		</dependency>  		
+  		
   		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
@@ -73,6 +85,32 @@
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
 			<version>2.6.3</version>
+		</dependency>
+		
+		<dependency> 
+			<groupId>com.comphenix.protocol</groupId>
+			<artifactId>ProtocolLib</artifactId>
+			<version>4.4.0</version> 
+			<exclusions>
+				<exclusion>
+					<groupId>com.comphenix.executors</groupId>
+					<artifactId>BukkitExecutors</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		
+		<dependency>
+           <groupId>org.bukkit</groupId>
+           <artifactId>bukkit</artifactId>
+           <version>1.11.2-R0.1-SNAPSHOT</version><!--change this value depending on the version or use LATEST-->
+           <type>jar</type>
+           <scope>provided</scope>
+       </dependency>
+       
+       <dependency>
+    		<groupId>org.fusesource</groupId>
+    		<artifactId>sigar</artifactId>
+    		<version>1.6.4</version>
 		</dependency>
 		
 	</dependencies>

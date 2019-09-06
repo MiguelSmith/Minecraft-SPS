@@ -2,6 +2,7 @@ package org.koekepan.herobrineproxy.sps;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.koekepan.herobrineproxy.packet.IPacketSession;
 import org.koekepan.herobrineproxy.packet.PacketListener;
@@ -42,6 +43,7 @@ public interface ISPSConnection {
 	
 	// Sending functions
 	public void subscribeToChannel(String channel, String username); // "subscribe"
+	public void subscribeToChannel(String channel, Integer username);
 	public void subscribeToArea(String channel, String username, int x, int y, int AoI); // "subscribe"
 	public void unsubscribeFromChannel(String channel, String username); // "unsubscribe"
 	public void unsubscribeFromArea(String channel);
@@ -54,4 +56,8 @@ public interface ISPSConnection {
 	public void setType(String type);
 	public void checkLobbyConnection();
 	public void move(SPSPacket packet);
+	public void setPlayerUsername(int entityID, String username);
+	public String getPlayerUsername(int entityID);
+	public void setUUID(String username, UUID uuid);
+	public UUID getUUID(String username);
 }

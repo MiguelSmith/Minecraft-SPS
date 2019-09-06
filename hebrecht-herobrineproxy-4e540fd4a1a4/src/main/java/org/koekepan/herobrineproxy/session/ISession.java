@@ -1,5 +1,7 @@
 package org.koekepan.herobrineproxy.session;
 
+import java.util.UUID;
+
 import org.koekepan.herobrineproxy.behaviour.BehaviourHandler;
 import org.koekepan.herobrineproxy.sps.SPSEntityTracker;
 
@@ -24,4 +26,8 @@ public interface ISession {
 	public void setPositioned(boolean positioned);
 	public boolean isPositioned();
 	public void setEntityTracker(SPSEntityTracker spsEntityTracker);
+	public void setPlayerUsername(int entityID, String username);
+	public String getUsername(int entityID);
+	public void setUUID(String username, UUID uuid);
+	public UUID getUUID(String username);
 }

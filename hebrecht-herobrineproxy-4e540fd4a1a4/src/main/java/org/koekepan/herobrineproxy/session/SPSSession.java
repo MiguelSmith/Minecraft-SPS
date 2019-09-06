@@ -2,6 +2,7 @@ package org.koekepan.herobrineproxy.session;
 
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -215,6 +216,28 @@ public class SPSSession implements IServerSession {
 	public void setEntityTracker(SPSEntityTracker entityTracker) {
 		packetSession.setEntityTracker(entityTracker);		
 	}
+
+
+	@Override
+	public void setPlayerUsername(int entityID, String username) {
+		spsClient.setPlayerUsername(entityID, username);
+	}
+
+
+	@Override
+	public String getUsername(int entityID) {
+		return spsClient.getPlayerUsername(entityID);
+	}
+
+
+	@Override
+	public void setUUID(String username, UUID uuid) {
+		spsClient.setUUID(username, uuid);
+	}
 	
+	@Override
+	public UUID getUUID(String username) {
+		return spsClient.getUUID(username);
+	}
 	
 }

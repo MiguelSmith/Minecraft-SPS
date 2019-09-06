@@ -103,7 +103,7 @@ io.on('connection', function(socket) {
             socket: socket,                                     // socket
             x: 0,                                               // x coordinate of client
             y: 0,                                               // y coordinate of client
-            AoIRadius: 10                                       // radius of AoI (currently make it large enough that they will always send to each other)
+            AoIRadius: 100                                       // radius of AoI (currently make it large enough that they will always send to each other)
         };
 
     // handle type callback
@@ -179,7 +179,7 @@ io.on('connection', function(socket) {
             var sub = subscriberList["ingame"][usernames[name]];
             var subServer = subscriberList["ingame"][usernamesServer[name]];
 
-            //console.log("Updating sub from <" + sub.x + "," + sub.y + "> to <" + x + "," + y + ">")
+            console.log("Updating sub from <" + sub.x + "," + sub.y + "> to <" + x + "," + y + ">")
             sub.x = x;
             subServer.x = x;
             sub.y = y;
@@ -211,7 +211,7 @@ var _contains = function (sub, pubX, pubY, pubAoI) {
     var dist = Math.sqrt(Math.pow(dx,2) + Math.pow(dy,2));
 
     var difference = sub.AoI - dist;
-    console.log("pubAoI: " + pubAoI + " sub.AoI: " + sub.AoI + " Distance: " + dist + " Difference: " + difference);
+    //console.log("pubAoI: " + pubAoI + " sub.AoI: " + sub.AoI + " Distance: " + dist + " Difference: " + difference);
 
     if (difference >= 0) {
         return true;
@@ -275,7 +275,7 @@ var _subscribe = function (socket, channel, name, x, y, AoI) {
 }
 
 var _publish = function(socket, connectionID, player, x, y, radius, payload, channel, packetName) {
-    console.log("Attempting to send packet " + packetName + " from " + connectionID + " to channel " + channel + " for player " + player + " at <" + x + "," + y + "> for radius " + radius);
+    //console.log("Attempting to send packet " + packetName + " from " + connectionID + " to channel " + channel + " for player " + player + " at <" + x + "," + y + "> for radius " + radius);
 
     if (!subscriberList.hasOwnProperty(channel)) {
         console.log("Trying to publish to a channel that does not exist: " + channel);
@@ -298,7 +298,7 @@ var _publish = function(socket, connectionID, player, x, y, radius, payload, cha
             // player = channel == "lobby" ? player : sub.name;
             //console.log("Publishing to " + sub.subID);
 
-            console.log("Confirming sending packet " + packetName + " from "+connectionID+" to channel " + channel + " for player " + player + " at <" + x + "," + y + "> for radius " + radius);
+            //console.log("Confirming sending packet " + packetName + " from "+connectionID+" to channel " + channel + " for player " + player + " at <" + x + "," + y + "> for radius " + radius);
 
             socket.broadcast.to(connectionInfoList[sub.connectionID].socket.id).emit('publication', connectionID, player, x, y, radius, payload, channel, 0);
         }

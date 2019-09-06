@@ -25,8 +25,12 @@ public class ServerEntityStatusPacketBehaviour implements Behaviour<Packet> {
 		int entityID = p.getEntityId();
 		try {
 			SPSEntity entity = entityTracker.getEntity(entityID);
-			//ConsoleIO.println("Received ServerEntityVelocityPacket  <"+ entity.getX()+","+entity.getY()+","+ entity.getZ()+">");
-			entityTracker.updateEntity(entityID, entity, packet);
+			if (entity != null) {
+				//ConsoleIO.println("Received ServerEntityVelocityPacket  <"+ entity.getX()+","+entity.getY()+","+ entity.getZ()+">");
+				entityTracker.updateEntity(entityID, entity, packet);
+			} else {
+				entityTracker.forwardPacketWithPosition(p, 0, 0, 65);
+			}
 		} catch (Exception e) {
 			ConsoleIO.println("ServerEntityStatusPacketBehaviour::process -> Entity " + entityID + " could not be found.");
 		}

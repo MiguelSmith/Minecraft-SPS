@@ -1,7 +1,5 @@
 package org.koekepan.herobrineproxy.packet;
 
-import org.koekepan.herobrineproxy.ConsoleIO;
-
 import com.github.steveice10.packetlib.Session;
 import com.github.steveice10.packetlib.packet.Packet;
 
@@ -67,6 +65,13 @@ public class PacketSession implements IPacketSession {
 
 	@Override
 	public void moveEntity(Packet packet, int positionType) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void movePosition(Packet movementPacket) {
 		// TODO Auto-generated method stub
 		
 	}

@@ -1,20 +1,27 @@
 package org.koekepan.herobrineproxy.test;
 
 import java.io.IOException;
-
 import org.koekepan.herobrineproxy.ConsoleIO;
-import org.koekepan.herobrineproxy.HerobrineProxyV2;
 import org.koekepan.herobrineproxy.SPSServerProxy;
 import org.koekepan.herobrineproxy.session.IProxySessionNew;
+import org.koekepan.performance.Log;
 
 public class HerobrineServerProxy {
 	private static SPSServerProxy proxy = null;
-
+	
+	
 	public static void main(String[] args) {
 		String spsHost = "127.0.0.1";
 		int spsPort = 3000;
 		String serverHost = "127.0.0.1";
 		int serverPort = 25565;
+		
+		try {
+			Log.setup();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		
 		// read command line parameters
 		try {
@@ -35,7 +42,8 @@ public class HerobrineServerProxy {
 		} catch (NumberFormatException e) {
 			printUsageMessage();
 		}
-	
+        
+		
 		// start if proxy is set
 		if (proxy != null) {
 			proxy.bind();

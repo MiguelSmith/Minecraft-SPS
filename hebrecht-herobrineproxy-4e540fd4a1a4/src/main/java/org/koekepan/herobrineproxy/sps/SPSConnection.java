@@ -1,45 +1,29 @@
 package org.koekepan.herobrineproxy.sps;
 
-import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.koekepan.herobrineproxy.ConsoleIO;
-import org.koekepan.herobrineproxy.HerobrineProxyProtocol;
 import org.koekepan.herobrineproxy.SPSProxyProtocol;
-import org.koekepan.herobrineproxy.SPSServerProxy;
 import org.koekepan.herobrineproxy.packet.EstablishConnectionPacket;
 import org.koekepan.herobrineproxy.packet.IPacketSession;
-import org.koekepan.herobrineproxy.packet.PacketListener;
 import org.koekepan.herobrineproxy.session.IProxySessionConstructor;
 import org.koekepan.herobrineproxy.session.IProxySessionNew;
 import org.koekepan.herobrineproxy.session.ISession;
 
-import com.github.steveice10.mc.protocol.MinecraftProtocol;
-import com.github.steveice10.mc.protocol.data.SubProtocol;
 import com.github.steveice10.mc.protocol.packet.ingame.client.player.ClientPlayerPositionPacket;
 import com.github.steveice10.mc.protocol.packet.ingame.client.player.ClientPlayerPositionRotationPacket;
 import com.github.steveice10.mc.protocol.packet.ingame.server.ServerChatPacket;
 import com.github.steveice10.mc.protocol.packet.ingame.server.ServerJoinGamePacket;
 import com.github.steveice10.mc.protocol.packet.ingame.server.ServerPlayerListEntryPacket;
-import com.github.steveice10.mc.protocol.packet.ingame.server.entity.ServerEntityDestroyPacket;
-import com.github.steveice10.mc.protocol.packet.ingame.server.entity.ServerEntityPositionPacket;
-import com.github.steveice10.mc.protocol.packet.ingame.server.entity.ServerEntityPositionRotationPacket;
-import com.github.steveice10.mc.protocol.packet.ingame.server.entity.player.ServerPlayerPositionRotationPacket;
-import com.github.steveice10.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnPlayerPacket;
-import com.github.steveice10.mc.protocol.packet.login.client.LoginStartPacket;
-import com.github.steveice10.mc.protocol.packet.login.server.LoginSetCompressionPacket;
-import com.github.steveice10.mc.protocol.packet.login.server.LoginSuccessPacket;
-import com.github.steveice10.packetlib.Session;
-import com.github.steveice10.packetlib.io.NetInput;
-import com.github.steveice10.packetlib.io.NetOutput;
 import com.github.steveice10.packetlib.io.buffer.ByteBufferNetInput;
 import com.github.steveice10.packetlib.io.buffer.ByteBufferNetOutput;
 import com.github.steveice10.packetlib.packet.Packet;
-import com.github.steveice10.packetlib.packet.PacketProtocol;
 import com.google.gson.Gson;
 
 import io.socket.client.IO;
@@ -54,12 +38,16 @@ public class SPSConnection implements ISPSConnection {
 	private int connectionID;
 	private String type;
 	private int numLogins;
+	private Map<Integer, String> players;
+	private Map<String, UUID> uuids;
 	
 	private SPSProxyProtocol protocol;
 	//private PacketProtocol protocol;
 	private Map<String, ISession> listeners = new HashMap<String, ISession>();
 	private Map<String,IPacketSession> sessions = new HashMap<String, IPacketSession>();
+	private Map<String, Integer> clientIDs = new HashMap<String, Integer>();
 	private IProxySessionConstructor sessionConstructor;
+	static Logger logger = LogManager.getLogger(SPSConnection.class);
 	//private IPacketSession packetSession;
 	
 	public SPSConnection(String SPSHost, int SPSPort) {
@@ -67,6 +55,8 @@ public class SPSConnection implements ISPSConnection {
 		this.SPSPort = SPSPort;
 		this.protocol = new SPSProxyProtocol();
 		numLogins = 0;
+		players = new HashMap<>();
+		uuids = new HashMap<>();
 	}
 	
 	
@@ -82,6 +72,10 @@ public class SPSConnection implements ISPSConnection {
 		try {
 			this.socket = IO.socket(URL);
 			result = true;
+			if (type == "server") {
+				ConsoleIO.println("publish");
+				this.socket.emit("type", type);
+			}
 		} catch (URISyntaxException e) {
 				e.printStackTrace();
 		}
@@ -101,10 +95,22 @@ public class SPSConnection implements ISPSConnection {
 			@Override
 			public void call(Object... data) {
 				ConsoleIO.println("type: " + type);
+				receiveConnectionID((int) data[0]);
+				clientIDs.put(type, connectionID);
 				if (type == "server") {
-					socket.emit("type", type);
 					subscribeToChannel("lobby", type);
+				} else {
+					subscribeToChannel("lobby", connectionID);					
 				}
+			}
+		});
+		
+		socket.on("join", new Emitter.Listener() {
+			
+			@Override
+			public void call(Object... data) {
+				ConsoleIO.println("Join received with data: " + data);
+				clientIDs.put((String) data[0],(Integer) data[1]);
 			}
 		});
 
@@ -113,9 +119,9 @@ public class SPSConnection implements ISPSConnection {
 			public void call(Object... data) {
 				SPSPacket packet = receivePublication(data);
 				String username = packet.username;
-				int x = packet.x;
-				int y = packet.y;
-				int radius = packet.radius;
+				//int x = packet.x;
+				//int y = packet.y;
+				//int radius = packet.radius;
 				
 				// TODO: look at possible polymorphic implementation of this. Create new interface to handle publish-time packet behaviours
 				// eg. packet.publish() -> do checks or nothing depending on packet type instead of "instanceof" implementation
@@ -124,12 +130,14 @@ public class SPSConnection implements ISPSConnection {
 					//LoginStartPacket loginPacket = (LoginStartPacket)packet.packet;
 					username = loginPacket.getUsername();
 					if (loginPacket.establishConnection()) {
+						logger.error(loginPacket.getUsername() + " connected");
 						ConsoleIO.println("SPSConnection::publication Must establish new connection for session <"+username+">");
 						IProxySessionNew proxySession = sessionConstructor.createProxySession(username);
 						String host = proxySession.getServerHost();
 						int port = proxySession.getServerPort();
 						proxySession.connect(host, port);					
 					} else {
+						logger.debug(loginPacket.getUsername() + " disconnected");
 						ConsoleIO.println("SPSConnection::publication Must disconnect session of user <"+username+">");
 						IProxySessionNew proxySession = sessionConstructor.getProxySession(username);
 						if (proxySession != null) {
@@ -158,14 +166,12 @@ public class SPSConnection implements ISPSConnection {
 							sessions.get(username).setLogin(true);
 						}
 					} else if (packet.packet instanceof ClientPlayerPositionRotationPacket || packet.packet instanceof ClientPlayerPositionPacket) {
-						sessions.get(username).updatePosition(packet.packet);
-					}  else if (packet.packet instanceof ServerSpawnPlayerPacket || packet.packet instanceof ServerEntityDestroyPacket) {
-						ConsoleIO.println("Received packet " + packet.packet.getClass().getSimpleName());
+						sessions.get(username).movePosition(packet.packet);
 					}
 					
 					listeners.get(username).sendPacket(packet.packet);
 				} else {
-					ConsoleIO.println("SPSConnection::publication => Received a packet for an unknown session <"+username+">");
+					ConsoleIO.println("SPSConnection::publication => Received a packet (" + packet.packet.getClass().getSimpleName() + ") for an unknown session <"+username+">");
 				}
 			}
 		});
@@ -239,8 +245,9 @@ public class SPSConnection implements ISPSConnection {
 			if (!session.getLogin()) {
 				
 				switch (type) {
-				case "client":
+				case "client": {
 						// Do we need to do something for client here?
+				}
 					break;
 					
 				case "server" : {
@@ -262,9 +269,11 @@ public class SPSConnection implements ISPSConnection {
 		} catch (Exception e) {
 			ConsoleIO.println("Packet session has not yet been initialised.");
 		} finally {
-			//if (type == "client")
-				//ConsoleIO.println("Connection <"+connectionID+"> sent packet <"+packet.packet.getClass().getSimpleName()+"> on channel <"+packet.channel+"> to player " + packet.username);
-			socket.emit("publish", connectionID, packet.username, packet.x, packet.y, packet.radius, json, packet.channel, packet.packet.getClass().getSimpleName());			
+			if (type == "client") {
+				ConsoleIO.println("Connection <"+clientIDs.get(packet.username)+"> sent packet <"+packet.packet.getClass().getSimpleName()+"> on channel <"+packet.channel+"> to player " + packet.username);
+			}
+			
+			socket.emit("publish", clientIDs.get(packet.username), packet.username, packet.x, packet.y, packet.radius, json, packet.channel, packet.packet.getClass().getSimpleName());			
 		}
 	}
 	
@@ -274,26 +283,33 @@ public class SPSConnection implements ISPSConnection {
 		Gson gson = new Gson();
 		byte[] payload = this.packetToBytes(packet.packet);
 		String json = gson.toJson(payload);
-		socket.emit("move", connectionID, packet.username, packet.x, packet.y, packet.radius, json, packet.channel, packet.packet.getClass().getSimpleName());
+		socket.emit("move", clientIDs.get(packet.username), packet.username, packet.x, packet.y, packet.radius, json, packet.channel, packet.packet.getClass().getSimpleName());
 	}
 
 
 	@Override
 	public void subscribeToChannel(String channel, String username) {
 		ConsoleIO.println("Subscribing to channel " + channel);
-		socket.emit("subscribe", channel, username);
+		socket.emit("subscribe", clientIDs.get(username), channel, username);
+	}
+	
+	@Override
+	public void subscribeToChannel(String channel, Integer connectionID) {
+		ConsoleIO.println("Subscribing to channel " + channel);
+		socket.emit("subscribe", connectionID, channel, type);
 	}
 
 	@Override
 	public void subscribeToArea(String channel, String username, int x, int y, int AoI) {
 		ConsoleIO.println("SPSConnection::subscribetoArea => Subscribing to <" + x + "," + y + "> with an area of " + AoI + " on channel " + channel);
-		socket.emit("subscribe", channel, username, x, y, AoI);
+		socket.emit("subscribe", clientIDs.get(username), channel, username, x, y, AoI);
 	}
 
 	@Override
 	public void unsubscribeFromChannel(String channel, String username) {
 		ConsoleIO.println("SPSConnection::unsubscribeFromChannel => Unsubscribing from channel " + channel);
-		socket.emit("unsubscribe", channel, username);
+		
+		socket.emit("unsubscribe", connectionID, channel, username);
 	}
 
 
@@ -342,6 +358,7 @@ public class SPSConnection implements ISPSConnection {
 	@Override
 	public void addListener(ISession listener) {
 		String username = listener.getUsername();
+		ConsoleIO.println("SPSConnection::addListener => adding listener " + username);
 		listeners.put(username, listener);
 	}
 	
@@ -368,12 +385,14 @@ public class SPSConnection implements ISPSConnection {
 	@Override
 	public void receivePacketSession(IPacketSession session, String username) {
 		ConsoleIO.println("SPSConnection::receivePacketSession => Received packet session " + session.getClass().getSimpleName() + " for username " + username);
-		this.sessions.put(username, session);		
+		this.sessions.put(username, session);
+		socket.emit("join", username, type);
 	}
 
 
 	@Override
 	public void setType(String type) {
+		ConsoleIO.println("SPSConnection::setType => " + type);
 		this.type = type;
 	}
 
@@ -382,8 +401,33 @@ public class SPSConnection implements ISPSConnection {
 	public void checkLobbyConnection() {
 		if (numLogins == 0) {
 			ConsoleIO.println("Not connected to lobby");
-			subscribeToChannel("lobby", type);
+			socket.emit("type", type);
 		}
 		numLogins++;
+	}
+
+
+	@Override
+	public void setPlayerUsername(int entityID, String username) {
+		//ConsoleIO.println("SPSConnection::setPlayerUsername => setting ID <" + entityID + "> to username " + username);
+		players.put(entityID, username);		
+	}
+
+
+	@Override
+	public String getPlayerUsername(int entityID) {
+		//ConsoleIO.println("SPSConnection::setPlayerUsername => getting ID <" + entityID + "> which returns username " + players.get(entityID));
+		return players.get(entityID);
+	}
+
+
+	@Override
+	public void setUUID(String username, UUID uuid) {
+		uuids.put(username, uuid);		
+	}
+	
+	@Override
+	public UUID getUUID(String username) {
+		return uuids.get(username);
 	}
 }
