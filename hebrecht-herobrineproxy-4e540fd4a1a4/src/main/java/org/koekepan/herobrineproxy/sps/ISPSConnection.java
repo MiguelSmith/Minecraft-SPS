@@ -54,6 +54,7 @@ public interface ISPSConnection {
 	public void removeListener(ISession listener);
 	public void receivePacketSession(IPacketSession session, String username);
 	public void setType(String type);
+	public String getType();
 	public void checkLobbyConnection();
 	public void move(SPSPacket packet);
 	public void setPlayerUsername(int entityID, String username);

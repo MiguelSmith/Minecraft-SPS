@@ -32,6 +32,8 @@ public class ServerEntityPositionPacketBehaviour implements Behaviour<Packet> {
 			SPSEntity entity = entityTracker.getEntity(entityID);
 			if (entity != null ) {
 				//ConsoleIO.println("Received ServerEntityPositionPacket  <"+ entity.getX()+","+entity.getY()+","+ entity.getZ()+">");
+				entity.setPitch(p.getPitch());
+				entity.setYaw(p.getYaw());
 				entity.move(p.getMovementX(), p.getMovementY(),p.getMovementZ());
 				entityTracker.updateEntity(entityID, entity, packet);
 			} else {

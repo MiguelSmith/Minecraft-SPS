@@ -20,11 +20,11 @@ public class PacketAdapter extends SessionAdapter {
 	@Override
 	public void packetReceived(PacketReceivedEvent event) {
 	//	ConsoleIO.println("PacketAdapter::packetReceived => Received packet <"+event.getPacket().getClass().getSimpleName()+"> from host <"+event.getSession().getHost()+":"+event.getSession().getPort()+">");
-	//	ConsoleIO.println(event.getPacket().toString());
+		ConsoleIO.println(event.getPacket().toString());
 		Session session = event.getSession();
 		 if (session.getPacketProtocol() instanceof MinecraftProtocol) {
 			 MinecraftProtocol protocol = (MinecraftProtocol)session.getPacketProtocol();
-			// ConsoleIO.println("PacketAdapter::packetReceived => Protocol status <"+protocol.getSubProtocol().toString()+"> and CompressionThreshold <"+session.getCompressionThreshold()+">");
+			ConsoleIO.println("PacketAdapter::packetReceived => Protocol status <"+protocol.getSubProtocol().toString()+"> and CompressionThreshold <"+session.getCompressionThreshold()+">");
 		 }
 		listener.packetReceived(event.getPacket());
 	}

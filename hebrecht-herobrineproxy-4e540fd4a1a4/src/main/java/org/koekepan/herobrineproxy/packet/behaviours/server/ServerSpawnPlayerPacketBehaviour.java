@@ -1,6 +1,7 @@
 package org.koekepan.herobrineproxy.packet.behaviours.server;
 
 import org.koekepan.herobrineproxy.behaviour.Behaviour;
+import org.koekepan.herobrineproxy.session.IProxySessionNew;
 import org.koekepan.herobrineproxy.sps.SPSEntity;
 import org.koekepan.herobrineproxy.sps.SPSEntityTracker;
 
@@ -24,5 +25,6 @@ private SPSEntityTracker entityTracker;
 		//ConsoleIO.println("ServerSpawnPlayerPacket::process => Spawn " + entityID + " at <"+ p.getX() +","+p.getY()+","+ p.getZ()+">");
 		SPSEntity entity = new SPSEntity(entityID, p.getUUID(), null, p.getX(), p.getY(), p.getZ(), p.getYaw(),  p.getPitch(), 0, 0, 0, 0);
 		entityTracker.setPlayerID(entityID, entity, packet);
+		entityTracker.setUUID(entityTracker.getPlayerUsername(entityID), p.getUUID());
 	}
 }

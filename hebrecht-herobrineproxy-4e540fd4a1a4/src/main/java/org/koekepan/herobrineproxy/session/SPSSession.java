@@ -71,7 +71,9 @@ public class SPSSession implements IServerSession {
 		ConsoleIO.println("SPSSession::setUsername => Setting session username to <"+username+">");
 		this.username = username;
 		this.packetSession.setUsername(username);
-		this.spsClient.addListener(this);
+		if (this.spsClient.getType() == "server") {
+			this.spsClient.addListener(this);			
+		}
 	}
 	
 	

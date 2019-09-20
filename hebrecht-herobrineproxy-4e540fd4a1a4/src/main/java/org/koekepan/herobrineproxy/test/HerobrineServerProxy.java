@@ -1,6 +1,8 @@
 package org.koekepan.herobrineproxy.test;
 
 import java.io.IOException;
+
+import org.apache.logging.log4j.LogManager;
 import org.koekepan.herobrineproxy.ConsoleIO;
 import org.koekepan.herobrineproxy.SPSServerProxy;
 import org.koekepan.herobrineproxy.session.IProxySessionNew;
@@ -64,6 +66,7 @@ public class HerobrineServerProxy {
 
 			ConsoleIO.println("Herobrine Server Proxy is stopping...");
 			proxy.close();
+			LogManager.shutdown();
 
 			// wait for key press to end program
 			System.out.println("Press any key to continue...");

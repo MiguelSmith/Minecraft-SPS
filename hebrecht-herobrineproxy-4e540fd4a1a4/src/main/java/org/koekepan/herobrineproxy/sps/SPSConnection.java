@@ -1,5 +1,6 @@
 package org.koekepan.herobrineproxy.sps;
 
+import java.io.Console;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
@@ -122,6 +123,7 @@ public class SPSConnection implements ISPSConnection {
 				//int x = packet.x;
 				//int y = packet.y;
 				//int radius = packet.radius;
+				//ConsoleIO.println("SPSConnection::publication => Received publication from " + packet.username + " on channel " + packet.channel + " of type <" + packet.packet.getClass().getSimpleName() + ">");
 				
 				// TODO: look at possible polymorphic implementation of this. Create new interface to handle publish-time packet behaviours
 				// eg. packet.publish() -> do checks or nothing depending on packet type instead of "instanceof" implementation
@@ -132,30 +134,30 @@ public class SPSConnection implements ISPSConnection {
 					if (loginPacket.establishConnection()) {
 						logger.error(loginPacket.getUsername() + " connected");
 						ConsoleIO.println("SPSConnection::publication Must establish new connection for session <"+username+">");
-						IProxySessionNew proxySession = sessionConstructor.createProxySession(username);
-						String host = proxySession.getServerHost();
-						int port = proxySession.getServerPort();
-						proxySession.connect(host, port);					
+							IProxySessionNew proxySession = sessionConstructor.createProxySession(username);
+							String host = proxySession.getServerHost();
+							int port = proxySession.getServerPort();
+							proxySession.connect(host, port);
 					} else {
 						logger.debug(loginPacket.getUsername() + " disconnected");
 						ConsoleIO.println("SPSConnection::publication Must disconnect session of user <"+username+">");
-						IProxySessionNew proxySession = sessionConstructor.getProxySession(username);
+						IProxySessionNew proxySession = sessionConstructor.getProxySession(username);	
 						if (proxySession != null) {
 							proxySession.disconnect();
 						} else {
-							ConsoleIO.println("SPSConnection::publication => Received a packet for an unknown session <"+username+">");
+							ConsoleIO.println("SPSConnection::publication => Received a packet (" + packet.packet.getClass().getSimpleName() + ") for an unknown session <"+username+">");
 						}
 					}
 				} else if (listeners.containsKey(username)) {					
 					//listeners.get(username).packetReceived(packet.packet);
-					//ConsoleIO.println("SPSConnection::publication => Sending packet <"+packet.packet.getClass().getSimpleName()+"> for player <"+username+"> at <"+x+":"+y+":"+radius+">");
+					//ConsoleIO.println("SPSConnection::publication => Sending packet <"+packet.packet.getClass().getSimpleName()+"> for player <"+username+"> at <"+x+":"+y+":"+radius+"> to the client session");
 				
 					if (!sessions.get(username).getLogin()) {
 						ConsoleIO.println("Login: " + sessions.get(username).getLogin());
 						if (packet.packet instanceof ServerJoinGamePacket) {
 							ConsoleIO.println("SPSConnection::publication Received ServerJoinGame packet. Subscribe to 'ingame'");
-							subscribeToChannel("ingame", username);
-							sessions.get(username).setChannel("ingame");
+							subscribeToChannel(username, username);
+							sessions.get(username).setChannel(username);
 						} else if (packet.packet instanceof ServerChatPacket) { 
 							// the last single "login" packet received by client before chunk data starts flowing in
 							numLogins--;
@@ -254,8 +256,8 @@ public class SPSConnection implements ISPSConnection {
 					ConsoleIO.println("Login: " + session.getLogin());
 					if (packet.packet instanceof ServerPlayerListEntryPacket) {
 						ConsoleIO.println("SPSConnection::publish Changing channel to 'ingame' " + session.getClass().getSimpleName());
-						session.setChannel("ingame"); // look at changing channel implementation to packet specific channels instead of packet session specific channel 
-						subscribeToChannel("ingame", session.getUsername());
+						session.setChannel(session.getUsername()); // look at changing channel implementation to packet specific channels instead of packet session specific channel 
+						subscribeToChannel(session.getUsername(), session.getUsername());
 						session.setLogin(true);
 					}	
 				}
@@ -270,7 +272,7 @@ public class SPSConnection implements ISPSConnection {
 			ConsoleIO.println("Packet session has not yet been initialised.");
 		} finally {
 			if (type == "client") {
-				ConsoleIO.println("Connection <"+clientIDs.get(packet.username)+"> sent packet <"+packet.packet.getClass().getSimpleName()+"> on channel <"+packet.channel+"> to player " + packet.username);
+				//ConsoleIO.println("Connection <"+clientIDs.get(packet.username)+"> sent packet <"+packet.packet.getClass().getSimpleName()+"> on channel <"+packet.channel+"> to player " + packet.username);
 			}
 			
 			socket.emit("publish", clientIDs.get(packet.username), packet.username, packet.x, packet.y, packet.radius, json, packet.channel, packet.packet.getClass().getSimpleName());			
@@ -395,6 +397,11 @@ public class SPSConnection implements ISPSConnection {
 		ConsoleIO.println("SPSConnection::setType => " + type);
 		this.type = type;
 	}
+	
+	@Override
+	public String getType() {
+		return this.type;
+	}
 
 
 	@Override
@@ -423,7 +430,8 @@ public class SPSConnection implements ISPSConnection {
 
 	@Override
 	public void setUUID(String username, UUID uuid) {
-		uuids.put(username, uuid);		
+		uuids.put(username, uuid);
+		logger.error("",uuid,username);
 	}
 	
 	@Override

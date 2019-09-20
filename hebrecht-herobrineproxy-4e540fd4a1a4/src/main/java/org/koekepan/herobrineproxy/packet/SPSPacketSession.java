@@ -118,7 +118,7 @@ public class SPSPacketSession implements IPacketSession {
 			// currently only use two dimensions
 			y = (int) packet.getY();
 			z = (int) packet.getZ();
-			//ConsoleIO.println("SPSPacketSession::SetPosition -> Setting position to <" + packet.getX() + "," + packet.getY() + ">");
+			ConsoleIO.println("SPSPacketSession::SetPosition -> Setting position to <" + packet.getX() + "," + packet.getY() + ">");
 		}
 		this.positioned = true;
 	}
@@ -131,6 +131,7 @@ public class SPSPacketSession implements IPacketSession {
 
 	public void setPositionAndMove(Packet responsePacket) {
 		updatePosition(responsePacket);		
+		ConsoleIO.println("SPSPacketSession::setPositionAndMove => sending move to SPS");
 		sendMove(x, y, z, radius, channel, responsePacket);
 	}
 	

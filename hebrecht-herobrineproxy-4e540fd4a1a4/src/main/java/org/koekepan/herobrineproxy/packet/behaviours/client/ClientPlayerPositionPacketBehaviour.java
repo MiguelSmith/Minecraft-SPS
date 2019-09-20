@@ -1,5 +1,6 @@
 package org.koekepan.herobrineproxy.packet.behaviours.client;
 
+import org.koekepan.herobrineproxy.ConsoleIO;
 import org.koekepan.herobrineproxy.behaviour.Behaviour;
 import org.koekepan.herobrineproxy.session.IProxySessionNew;
 
@@ -19,6 +20,7 @@ public class ClientPlayerPositionPacketBehaviour implements Behaviour<Packet> {
 	
 	@Override
 	public void process(Packet packet) {
+		ConsoleIO.println("ClientPlayerPositionRotationPacketBehaviour::process => processing packet.");
 		proxySession.setPosition(packet);
 	}
 
