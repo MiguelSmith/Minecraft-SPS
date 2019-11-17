@@ -50,7 +50,7 @@ public class SPSEntityTracker {
 		entities.put(entityID, entity);
 		try {
 			if (session.isPositioned()) {
-				ConsoleIO.println("SPSEntityTracker::updatEntity => entityID: " + entityID + " player: " + session.getUsername() +" UUID: " + getUUID(getPlayerUsername(entityID)) + "  <" + entity.getX() + "," + entity.getY() + "," + entity.getZ() + "," + "> " + packet.getClass().getSimpleName());
+				//ConsoleIO.println("SPSEntityTracker::updatEntity => entityID: " + entityID + " player: " + session.getUsername() +" UUID: " + getUUID(getPlayerUsername(entityID)) + "  <" + entity.getX() + "," + entity.getY() + "," + entity.getZ() + "," + "> " + packet.getClass().getSimpleName());
 				//logger.info("<" + entityID + "> " + getPlayerUsername(entityID) + " moved to <" + entity.getX() + "," + entity.getY() + "," + entity.getZ() + ">");				
 				logger.info("", System.currentTimeMillis(),getUUID(getPlayerUsername(entityID)), entity.getX(), entity.getY(), entity.getZ(), entity.getPitch(), entity.getYaw(), session.getUsername(), entityID);
 				//logger.debug("entityID: " + entityID + " UUID: " + getUUID(getPlayerUsername(entityID)).toString() + " <" + entity.getX() + "," + entity.getY() + "," + entity.getZ() + "," + "> " + packet.getClass().getSimpleName());
@@ -78,7 +78,7 @@ public class SPSEntityTracker {
 	public void setPlayerID(int entityID, SPSEntity entity, Packet packet) {
 		player = entity;
 		entities.put(entityID, player);
-		ConsoleIO.println("SPSEntityTracker::setPlayerID => Player ID set to " + entityID + " for player " + player.getUUID());
+		//ConsoleIO.println("SPSEntityTracker::setPlayerID => Player ID set to " + entityID + " for player " + player.getUUID());
 		try {
 			if (session.isPositioned()) {
 				session.sendWithPosition(packet,entity.getX(),entity.getZ(), entity.getPrevX(), entity.getPrevZ(), 0);

@@ -9,6 +9,7 @@ import org.koekepan.herobrineproxy.session.ClientSession;
 import org.koekepan.herobrineproxy.session.ClientToSPSProxy;
 import org.koekepan.herobrineproxy.session.IClientSession;
 import org.koekepan.herobrineproxy.session.IProxySessionNew;
+import org.koekepan.herobrineproxy.session.ProxySession;
 import org.koekepan.herobrineproxy.sps.ISPSConnection;
 import org.koekepan.herobrineproxy.sps.SPSConnection;
 
@@ -66,6 +67,7 @@ public class SPSClientProxy {
 
 			@Override
 			public void sessionRemoved(SessionRemovedEvent event) {
+				sessions.get(event.getSession()).disconnect();
 				sessions.remove(event.getSession()).disconnect();
 			}
 		});

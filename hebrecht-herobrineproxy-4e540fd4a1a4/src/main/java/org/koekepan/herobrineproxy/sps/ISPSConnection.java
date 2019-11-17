@@ -38,7 +38,7 @@ public interface ISPSConnection {
 	public void disconnect();
 	// Receiving functions
 	public SPSPacket receivePublication(Object... data);  // "publication"
-	public void receiveConnectionID(int connection); // "type"
+	public void receiveConnectionID(String connection); // "type"
 
 	
 	// Sending functions

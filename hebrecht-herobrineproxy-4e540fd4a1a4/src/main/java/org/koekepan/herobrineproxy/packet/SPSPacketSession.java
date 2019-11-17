@@ -131,7 +131,7 @@ public class SPSPacketSession implements IPacketSession {
 
 	public void setPositionAndMove(Packet responsePacket) {
 		updatePosition(responsePacket);		
-		ConsoleIO.println("SPSPacketSession::setPositionAndMove => sending move to SPS");
+		//ConsoleIO.println("SPSPacketSession::setPositionAndMove => sending move to SPS");
 		sendMove(x, y, z, radius, channel, responsePacket);
 	}
 	

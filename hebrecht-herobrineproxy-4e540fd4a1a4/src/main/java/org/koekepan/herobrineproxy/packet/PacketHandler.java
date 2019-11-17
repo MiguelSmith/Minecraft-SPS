@@ -65,7 +65,7 @@ public class PacketHandler implements Runnable, PacketListener {
 		//	ConsoleIO.println("PacketHandler::addPacketToIncomingQueue => Attempting to add packet <"+packet.getClass().getSimpleName()+"> that has registered behaviour <"+behaviours.hasBehaviour(packet.getClass())+"> to queue");
 			//behaviours.printBehaviours();
 			if (behaviours.hasBehaviour(packet.getClass())) {
-				ConsoleIO.println("PacketHandler::addPacketToIncomingQueue => Has registered behaviour for packet <"+packet.getClass().getSimpleName()+">");
+				//ConsoleIO.println("PacketHandler::addPacketToIncomingQueue => Has registered behaviour for packet <"+packet.getClass().getSimpleName()+">");
 				incomingPackets.add(packet);
 			}
 		} catch (IllegalStateException e) {
@@ -113,7 +113,7 @@ public class PacketHandler implements Runnable, PacketListener {
 		try {
 			packet = incomingPackets.poll();
 			if (packet != null) {
-				ConsoleIO.println("PacketHandler::run => Processing packet <"+packet.getClass().getSimpleName()+">. Packets remaining in queue: "+incomingPackets.size());
+				//ConsoleIO.println("PacketHandler::run => Processing packet <"+packet.getClass().getSimpleName()+">. Packets remaining in queue: "+incomingPackets.size());
 				behaviours.process(packet);
 			}
 			
